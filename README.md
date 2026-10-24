@@ -111,6 +111,15 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 - [steal-like-an-artist](skills/productivity/steal-like-an-artist/SKILL.md): adapt someone else's skill into a brief for skillify.
 - [setup-statusline](skills/productivity/setup-statusline/SKILL.md): install a compact Claude Code status line.
 
+## Credits
+
+Many of these skills started from other people's work:
+
+- [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `research` and `retro` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
+- [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill.
+
+Each of those skills names its source in `metadata.inspired-by` in its frontmatter.
+
 ## Contributing
 
 Repo rules for agents and humans are in [AGENTS.md](AGENTS.md). Every change

@@ -1,6 +1,8 @@
 ---
 name: brainstorm
 description: Read before acting on a plan, decision, or idea that still has open questions. Use when the user wants to stress-test their thinking or work a problem through together. Produces a shared understanding with every open decision put to the user.
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 Interview the user until you reach a shared understanding. Map this as a **design tree**: every decision branches into the decisions that hang off it.

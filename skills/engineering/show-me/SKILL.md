@@ -1,6 +1,8 @@
 ---
 name: show-me
 description: Read before explaining something easier to see than to read, such as code flow, the shape of a change, or how components fit. Use when the user wants a visual, or another skill needs visuals for a PR. Produces concise diagrams, code-shape sketches, or an HTML artifact.
+metadata:
+  inspired-by: "Dex Horthy and HumanLayer, https://github.com/humanlayer"
 ---
 
 Help the user understand the current topic of conversation visually. Skip the preamble and keep prose brief. Pick the smallest view that makes the key point clear.

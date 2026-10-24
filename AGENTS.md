@@ -69,3 +69,9 @@ Release workflow opens a "chore: version skills" PR; `npm run version` bumps
 `package.json`, copies the version into `.claude-plugin/plugin.json` and
 writes `CHANGELOG.md`. Merging that PR tags `vX.Y.Z` and publishes a GitHub
 release. Installed plugins update when the `plugin.json` version changes.
+
+## Credits
+
+A skill built from someone else's work names them in its frontmatter,
+`metadata.inspired-by: "<who>, <link>"`, and in the README's Credits section.
+Keep both when rebuilding or renaming the skill.

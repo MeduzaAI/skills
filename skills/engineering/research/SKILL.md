@@ -1,6 +1,8 @@
 ---
 name: research
 description: Read before investigating a question a later decision depends on. Use when the user or another skill wants a topic, API, or part of the codebase looked into against primary sources. Produces a cited artifact plus the findings inline.
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 ## Inputs

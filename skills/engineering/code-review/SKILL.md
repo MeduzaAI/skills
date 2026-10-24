@@ -1,6 +1,8 @@
 ---
 name: code-review
 description: Read before reviewing a branch, PR, or issue's changes against the repo's conventions and the spec they came from. Use when the user wants to know whether a change follows the standards, builds what was asked and tests it honestly. Produces Standards, Spec, Tests and repo-review findings, not a bug hunt.
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 # Code Review

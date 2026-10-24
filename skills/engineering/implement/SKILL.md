@@ -1,6 +1,8 @@
 ---
 name: implement
 description: Read before building from a task plan written by meduza:plan-task. Use when the user or a parent skill hands over a plan and wants it built. Produces a verified commit per touched repo, without a PR.
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 # Implement

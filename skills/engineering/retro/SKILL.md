@@ -2,6 +2,8 @@
 name: retro
 description: Read before reflecting on how a piece of agent-built work went, from its review comments or its sessions. Use when the user wants the same review comment or correction never to be needed again. Produces ranked improvements, each routed to the check, standard, skill or plan step that owns it.
 disable-model-invocation: true
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 # Retro
