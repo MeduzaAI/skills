@@ -1,0 +1,3 @@
+interface:
+  display_name: "Setup Statusline"
+  short_description: "Install the Claude Code status line on this machine"

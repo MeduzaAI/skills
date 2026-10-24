@@ -1,0 +1,17 @@
+{
+  "name": "meduza-skills",
+  "owner": {
+    "name": "Meduza AI",
+    "url": "https://github.com/MeduzaAI"
+  },
+  "description": "Meduza's agent skills, as an installable plugin.",
+  "plugins": [
+    {
+      "name": "meduza",
+      "source": "./",
+      "description": "Meduza's agent skills for shipping software: brainstorm, plan, build, review, verify and retro, plus skill authoring.",
+      "category": "engineering",
+      "keywords": ["engineering", "skills", "planning", "code-review", "verification"]
+    }
+  ]
+}

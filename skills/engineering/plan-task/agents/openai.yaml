@@ -1,0 +1,3 @@
+interface:
+  display_name: "Plan Task"
+  short_description: "Work out one task's files, interfaces, tests and flows"

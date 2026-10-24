@@ -1,0 +1,28 @@
+{
+  "name": "meduza",
+  "version": "1.0.0",
+  "description": "Meduza's agent skills for shipping software: brainstorm, plan, build, review, verify and retro, plus skill authoring.",
+  "author": {
+    "name": "Meduza AI",
+    "url": "https://github.com/MeduzaAI"
+  },
+  "repository": "https://github.com/MeduzaAI/skills",
+  "license": "MIT",
+  "keywords": ["engineering", "skills", "planning", "code-review", "verification"],
+  "skills": [
+    "./skills/engineering/brainstorm",
+    "./skills/engineering/build",
+    "./skills/engineering/build-project",
+    "./skills/engineering/code-review",
+    "./skills/engineering/implement",
+    "./skills/engineering/plan-project",
+    "./skills/engineering/plan-task",
+    "./skills/engineering/research",
+    "./skills/engineering/retro",
+    "./skills/engineering/show-me",
+    "./skills/engineering/verify",
+    "./skills/productivity/setup-statusline",
+    "./skills/productivity/skillify",
+    "./skills/productivity/steal-like-an-artist"
+  ]
+}

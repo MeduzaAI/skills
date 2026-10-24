@@ -1,0 +1,5 @@
+interface:
+  display_name: "Build Project"
+  short_description: "Build every slice of a planned project into PRs, unattended"
+policy:
+  allow_implicit_invocation: false

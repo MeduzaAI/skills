@@ -1,0 +1,3 @@
+interface:
+  display_name: "Plan Project"
+  short_description: "Lock a spec's decisions and cut it into tasks"
