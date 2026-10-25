@@ -16,8 +16,8 @@ checks that the assembled change behaves as asked on a real deployment.
 
 ## Inputs
 
-- **Consumes**: the task and its saved plan with the **Flows** section from
-  `meduza:plan-task`, the branch, its worktree and its draft PR, from the
+- **Consumes**: the task and its saved plan from `meduza:plan`, with the
+  slice's **flows**, the branch, its worktree and its draft PR, from the
   conversation or the calling skill. Missing → ask; never guess from the
   branch name.
 - **Produces**: evidence saved where the plan lives; regression tests
@@ -26,11 +26,11 @@ checks that the assembled change behaves as asked on a real deployment.
 
 | Condition | Behaviour |
 |---|---|
-| The plan has no Flows section (written before it existed) | Write them first: one fresh agent with `../plan-task/references/flows-writer-prompt.md`, saved into the plan. |
+| The slice has no flows | Write them first, in one fresh agent given the spec but not the code, so they check what was asked rather than restate what was built; save them into the plan. |
 | A deployment of the PR exists (the workspace documents preview or stage deploys, or the PR shows one in its checks or comments) | Walk the flows there, once it runs the PR's head commit. |
 | No deployment of the PR | Run it locally the way the repo documents. Mock a dependency that cannot run, and label every piece of evidence that relied on it ("mocked backend"). A flow walked against a mock can be Proved for this change; the real integration with what was mocked goes into the human QA plan. |
 | The repo or workspace ships its own demo-recording skill, whatever it is called | Record UI videos with it; it knows the app's auth, data and gated flows. |
-| The user is in the conversation (directly, or through an attended `meduza:build`) | Ask before destructive steps; still broken after three rounds → show the failing flows. |
+| The user is in the conversation | Ask before destructive steps; still broken after three rounds → show the failing flows. |
 | Nobody to ask (the caller says it runs as a worker) | Destructive steps are Not walkable; still broken → return Unproved with the failing flows. |
 
 ## Goal
@@ -110,7 +110,7 @@ the affected flows and rerun their tests. At most three rounds.
 
 ## 5. Save and report
 
-Save the evidence where `plan-task` saved the plan: attachments on the
+Save the evidence where the plan is saved: attachments on the
 issue via the workspace's tracker workflow. A repo-file spec has no issue:
 save beside it, uncommitted, mark those links "local to the author" in the
 table, and keep API tables and results inline so a reviewer still sees the

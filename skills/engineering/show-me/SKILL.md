@@ -126,4 +126,4 @@ You may use one of these, you may use several, it is unlikely you will use all o
 
 ### When called by another skill
 
-The caller's target is the topic — for a PR, the branch diff against its base. Return the visuals as markdown for the caller to embed (a PR body or a tracker document can't open a file). Produce the HTML file as well only when the caller asks for it, as `meduza:build-project` does for its merge guide.
+The caller's target is the topic — for a PR, the branch diff against its base. Return the visuals as markdown for the caller to embed (a PR body or a tracker document can't open a file). Produce the HTML file as well only when the caller asks for it, as a caller may for a large change.

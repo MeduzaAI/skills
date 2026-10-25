@@ -1,3 +1,5 @@
 interface:
   display_name: "Build"
-  short_description: "Take one task from issue to reviewed draft PR"
+  short_description: "Plan work with you, then build it slice by slice with checkpoints"
+policy:
+  allow_implicit_invocation: false

@@ -30,6 +30,8 @@ simplification passes (`simplify`).
   issue key, or a branch with its worktree path. None → the current branch,
   stated in the first line of the report.
 - **Spec and plan**: when the caller names the task and plan, use those.
+  When it names one slice of a plan, review that slice only: other slices'
+  requirements and test cases are not missing from this diff.
 - **Base**: the one the caller names, else the PR's base, else the repo's
   default branch.
 - **Axes**: all four, unless the caller names which to run (`meduza:verify`
@@ -57,8 +59,8 @@ workspace's documented issue-tracker workflow. Authority order when they
 disagree:
 
 1. A spec document attached to or linked from the issue.
-2. A plan attached to or linked from the issue, and the project plan it
-   belongs to, whose Decisions are binding.
+2. The plan attached to or linked from the issue, whose decisions are
+   binding.
 3. The issue's description and comments.
 4. The PR body.
 5. Spec or plan files the issue or PR references in the repo.
@@ -133,7 +135,7 @@ the axis is skipped and the report says so.
 **Spec sub-agent prompt** — include:
 
 - The diff command and commit list.
-- The path or fetched contents of the spec, and the project plan's
+- The path or fetched contents of the spec, and the plan's
   Decisions when there is one.
 - The brief: "Report: (a) requirements the spec asked for that are missing
   or partial; (b) behaviour in the diff that wasn't asked for (scope creep);
@@ -144,7 +146,7 @@ the axis is skipped and the report says so.
 **Tests sub-agent prompt** — include:
 
 - The diff command and commit list.
-- The plan's test cases when there is a plan, else the spec. The Flows
+- The test cases the plan lists for the slice, if any, else the spec. The Flows
   only when the caller says their regression tests are in the diff
   (`meduza:verify` does); before verify runs they do not exist yet.
 - The testing sources from step 3.
