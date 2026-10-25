@@ -1,138 +1,79 @@
 ---
 name: build
-description: Read before taking a tracked task from issue to pull request in one run. Use when the user hands over a task and wants it shipped, not one stage of it. Produces a reviewed draft PR per touched repo, placed in its stack, with its flows proved on a deployment and a skimmable description.
+description: Read before shipping an issue or a project end to end. Use when the user hands over existing work and wants it planned together, then built slice by slice into draft PRs with checkpoints to steer. Produces stacked draft PRs, reviewed and verified, and a plan true to what was built.
+disable-model-invocation: true
+metadata:
+  inspired-by: "Dex Horthy and HumanLayer, https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"
 ---
 
 # Build
 
-Walk one task through its phases and open its draft PR(s). Each phase owns
-its rules; this skill sequences them, carries values between them, and
-decides where the PR sits in its stack. The goal is a PR the user can skim:
-decisions were locked before building, standards were checked before the PR
-went up, the change was shown working on a deployment, and the description
-shows what changed and anything the agent had to decide.
+Plan the work with the user, then build it slice by slice, stopping at
+checkpoints where the user checks the PRs against the plan and steers what
+comes next. This session plans and orchestrates; each slice is built in a
+fresh worker, so this context holds the run, not the diffs.
 
 ## Inputs
 
-- **Consumes**: a task, named in the conversation (issue key or URL).
-  Missing → ask; never derive it from the branch.
-- **Produces**: a draft PR per touched repo and a one-table report.
+- **Consumes**: an existing issue, or a spec or project, named in the
+  conversation. Missing → ask; never derive it from the branch.
+- **Produces**: a draft PR per slice in the plan's stacks, and the plan
+  kept true to what was built.
 
-| Condition | Behaviour |
-|---|---|
-| The user is in the conversation | Blocked questions are asked; ends with the `/autofix-pr` hand-off. |
-| Dispatched as a worker (by `meduza:build-project`) | Nobody to ask: Blocked, Failed or Unproved is returned in the report; no hand-off. |
+## 1. Plan
 
-## 1. Task and base
+Run `meduza:plan` on the target, here, with the user. Nothing is built
+before they approve it.
 
-Resolve the task via the workspace's documented tracker workflow, and its
-project plan if it has one.
+Then file the slices **following the workspace's documented process**: one
+task per slice, with its blockers as tracker relations. A single slice → the
+issue itself is the task.
 
-Find the base branch. The project plan's stack map is the source when it
-exists:
+## 2. Run the slices
 
-- the base the caller gave, when it gave one, wins;
-- bottom of its stack (a one-PR stack included) → the repo's default branch,
-  new stack,
-  but only once every blocker in the same repo is merged; a blocker sitting
-  unmerged in another stack means the task is not ready;
-- higher in its stack → the head branch of the slice directly below, whose
-  PR must already be open; not open → the task is not ready, say so.
+Per slice, one fresh worker running `meduza:build-slice`, given pointers
+only: the plan, the slice, its task, the repo, its base (the default branch
+for the bottom of a stack, the slice below otherwise), and the PR of each
+blocker in another repo.
 
-No stack map → a blocker in the same repo with an open PR that is the **top**
-of its stack → stack on it. A blocker in the middle of a stack, or several
-unchained blockers → never fork a stack: attended, ask; as a worker, return
-Blocked. No such blocker → the default branch.
+A slice starts when:
 
-## 2. Plan and build
+- within its stack, the slice below it is built;
+- across stacks, every slice it depends on has passed a checkpoint, so
+  nothing is built on code the user has not seen.
 
-1. `meduza:plan-task` for the task: units and Flows. No saved plan → stop
-   (or return the Blocked question it raised).
-2. `meduza:implement` with the plan, the base, and a worktree per repo.
-   Its full verification is the test run.
+Stacks with no dependency between them run in parallel.
 
-Keep `implement`'s Deviations: they go into the PR body.
+## 3. Checkpoint
 
-## 3. Review until clean
+After each stack, and once after the first slice of the first stack, so
+the tracer bullet is checked before anything is built on it. Show per PR:
+its link and status, the planned shape beside the built shape from the
+worker's report, what was decided beyond the plan, and its flows.
 
-Per repo, at most three rounds. Each round runs, telling each the branch,
-worktree path, base, task and plan location so nothing is guessed:
+The user checks the PRs, then:
 
-- `meduza:code-review`: the spec and project Decisions, the repo's
-  documented standards, the tests against the plan, and the repo's own
-  review skill when it has one;
-- the built-in correctness review (`code-review` skill) for bugs.
+- **Pass** → the next stack.
+- **Rework** → a new `build-slice` worker with their feedback verbatim and
+  the worktree. Back to the checkpoint.
+- **A question** a worker returned → ask it; a new worker continues with
+  the answer.
 
-Clean = no Spec findings, no hard Tests findings, no documented-standard
-violations, nothing the repo review says must be fixed, no correctness bug; judgement calls go into the PR body. Not
-clean → one fresh fixer per repo with the repo path and
-the blocking findings verbatim: fix exactly those, verify with the repo's
-commands, one commit in its format, no push, and report any choice it made
-beyond the finding. Review again.
-
-Three rounds and still not clean → no PR. Attended, show the findings; as a
-worker, return Failed with them.
-
-## 4. Draft PR
-
-Per repo, following its `AGENTS.md`/`CLAUDE.md` and PR template:
-
-- **Always a draft.** The user moves it to ready after skimming it.
-- **Stacks through GitHub native stacks** (`gh stack`) when installed: a new
-  stack on the default branch, or added on top of the slice below. Submitting
-  creates the PR as a draft. Without `gh stack`, a draft PR against the base.
-  One branch, one PR, one parent: never two PRs based on the same branch.
-- **Title** per the repo's convention.
-- **Body**: the repo's PR template when it has one, filled slot by slot and
-  nothing added outside it; otherwise these, in order. Either way the content
-  is:
-  1. What changes and why, two or three sentences, issue link, and the
-     project Decisions it relies on (D2, D5, linked) so the reviewer does
-     not reopen them.
-  2. **Decided beyond the plan**: `implement`'s Deviations and every choice
-     a fixer reported. "None" when none. This is what the user reads first.
-  3. The shape of the change, from `meduza:show-me` with the branch diff
-     against its base as the topic: the smallest visual that makes it clear.
-  4. Tests: what `implement` ran; `verify` replaces it in step 5.
-  5. Judgement calls from review, if any.
-
-  No stack listing: `gh stack` shows it, and a list in the body goes stale as
-  the stack grows.
-
-## 5. Verify
-
-Per PR, `meduza:verify` with the task, plan location, branch, worktree,
-PR URL, and whether this run is a worker. It runs after the PR because the
-PR is what deploys the change to somewhere it can be walked. It walks the
-Flows, pushes their regression tests and any fixes, reviews what it pushed,
-and rewrites the testing section.
-
-Unproved → the PR stays a draft with the failing flows opening its body;
-status Unproved, the flows quoted in the report.
-
-## 6. Hand off `/autofix-pr` (attended)
-
-One PR at a time. Done for a PR when the session itself is on its branch
-(only entering the worktree moves the session; a `cd` does not), the user has the
-PR URL, and they have run `/autofix-pr` or said skip. It is a command only
-the user can invoke; ask and wait. A harness without `/autofix-pr` → skip
-this step.
+Code the user accepted differs from the plan → `meduza:plan` Revise before
+the next dependent slice starts. A push to a lower PR once slices sit on it
+→ restack them: `gh stack rebase`, then submit; without `gh stack`, rebase
+each branch onto the one below and force-push it.
 
 ## Report
 
-One table: repo, branch, base, stack position, PR URL, review rounds, flows
-proved / broken / not walkable, status, autofix launched or skipped. Status
-is Done, Blocked, Failed (review never came clean: no PR) or Unproved (draft
-PR open, flows still broken). Then worktree paths left on disk, and for the
-last three the question, findings or failing flows verbatim.
+One table: slice, stack, repo, PR, status, checkpoint rounds. Then what is
+blocked and why, and the next step: which stack to merge first, and
+`meduza:retro` on the PRs once they are merged.
 
 ## Common mistakes
 
-- Opening the PR as ready, or marking it ready → draft; the user decides.
-- Basing on a branch that already has another PR on top → never fork a stack.
-- Fixing findings in this session → a fresh fixer per round.
-- Opening a PR after three unclean review rounds → no PR; report the findings.
-- Closing the PR when verify fails → it stays a draft, Unproved, failure on top.
-- Writing the testing section from test output → verify's flow table.
-- Burying what the agent decided at the end of the body → second section.
-- Running `/autofix-pr` yourself → hand off and wait.
+- Building, reviewing or fixing in this session → a `build-slice` worker.
+- Pasting plan text into a worker → pointers.
+- Starting a slice in another stack before what it depends on passed a
+  checkpoint.
+- Building on after accepting a deviation without Revise.

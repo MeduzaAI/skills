@@ -1,7 +1,7 @@
 # Meduza skills
 
-Agent skills for shipping software: brainstorm a problem, plan a project,
-build each task to a reviewed draft PR, prove it works, and learn from the
+Agent skills for shipping software: brainstorm a problem, plan it with
+you, build it slice by slice into reviewed draft PRs, prove it works, and learn from the
 review. Works in Claude Code, Codex, Copilot, VS Code, Gemini CLI and any
 agent [skills.sh](https://skills.sh) supports.
 
@@ -77,14 +77,20 @@ skills.
 
 ## The delivery chain
 
-Each phase is its own session; the artifact it produces is the hand-off.
+You approve the plan, then check each stack of PRs against it before the
+next one is built.
 
 ```
-brainstorm ─▶ plan-project ─▶ build-project ─▶ (per task) build ─▶ retro
-               decisions,       stacks + merge   plan-task ─▶ implement
-               tasks, stacks    guide            ─▶ verify ─▶ code-review
-                                                 ─▶ draft PR
+build
+├─ plan                      with you: decisions, slices, how each is checked
+└─ per slice: build-slice    a fresh worker
+   ├─ implement
+   ├─ code-review
+   └─ verify                 → draft PR, then your checkpoint
 ```
+
+`brainstorm` comes before, while the idea is still open; `retro` after, on
+the merged PRs.
 
 Company process (statuses, labels, templates, QA) is never in these skills:
 they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
@@ -94,11 +100,10 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 ### Engineering
 
 - [brainstorm](skills/engineering/brainstorm/SKILL.md): work a plan or idea through, every open decision put to you.
-- [plan-project](skills/engineering/plan-project/SKILL.md): lock a spec's decisions and cut it into tasks, stacks and merge waves.
-- [plan-task](skills/engineering/plan-task/SKILL.md): work out one task's files, interfaces, tests and proving flows.
-- [implement](skills/engineering/implement/SKILL.md): build a task plan into a verified commit.
-- [build](skills/engineering/build/SKILL.md): take one task from issue to reviewed draft PR.
-- [build-project](skills/engineering/build-project/SKILL.md) (user-invoked): build every task of a planned project, unattended.
+- [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice with checkpoints.
+- [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is checked.
+- [build-slice](skills/engineering/build-slice/SKILL.md): implement, review and verify one planned slice into a draft PR.
+- [implement](skills/engineering/implement/SKILL.md): build one planned slice into a verified commit.
 - [verify](skills/engineering/verify/SKILL.md): prove a change works on its deployment, then guard it with tests.
 - [code-review](skills/engineering/code-review/SKILL.md): review a change against the repo's standards and its spec.
 - [research](skills/engineering/research/SKILL.md): investigate a question against primary sources.
@@ -116,7 +121,7 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 Many of these skills started from other people's work:
 
 - [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `research` and `retro` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
-- [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill.
+- [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill, and `plan` and `build` follow [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md).
 
 Each of those skills names its source in `metadata.inspired-by` in its frontmatter.
 
