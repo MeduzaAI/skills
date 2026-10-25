@@ -26,7 +26,7 @@ never decided here.
 it runs as a worker.
 
 Rework instead → one fresh fixer with the worktree and the feedback
-verbatim: change exactly that, run the repo's checks, one commit.
+verbatim, from chat or the PR's comments: change exactly that, run the repo's checks, one commit.
 
 ## 2. Review
 
