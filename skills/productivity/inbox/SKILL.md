@@ -67,7 +67,7 @@ fields.
 The board shows one item at a time in large type, with all items listed
 down the side. The user clicks an option (or presses a–d), or types their
 own answer. Each answer moves on to the next item. The footer collects
-every answer into one line to copy, for example `1a  2b  3: "ask cho first"`.
+every answer into one line to copy, for example `1a  2b  3: "ask sam first"`.
 
 Writing each item:
 
