@@ -20,6 +20,7 @@
     "./skills/engineering/retro",
     "./skills/engineering/show-me",
     "./skills/engineering/verify",
+    "./skills/productivity/inbox",
     "./skills/productivity/setup-statusline",
     "./skills/productivity/skillify",
     "./skills/productivity/steal-like-an-artist"

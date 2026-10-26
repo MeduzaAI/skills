@@ -1,0 +1,3 @@
+interface:
+  display_name: "Inbox"
+  short_description: "Clear an inbox: board of decisions, then apply"

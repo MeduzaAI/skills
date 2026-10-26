@@ -115,6 +115,7 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 
 - [skillify](skills/productivity/skillify/SKILL.md): capture a workflow from a session as a skill.
 - [steal-like-an-artist](skills/productivity/steal-like-an-artist/SKILL.md): adapt someone else's skill into a brief for skillify.
+- [inbox](skills/productivity/inbox/SKILL.md): clear a notification inbox with a click-to-answer board, then apply the answers.
 - [setup-statusline](skills/productivity/setup-statusline/SKILL.md): install a compact Claude Code status line.
 
 ## Credits

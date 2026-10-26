@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inbox</title>
+<style>
+  :root { --bg:#0f1115; --card:#171a21; --line:#262a33; --text:#e8eaee; --muted:#8b919c; --accent:#ccff00; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 -apple-system, "Inter", "Segoe UI", sans-serif; display:grid; grid-template-columns:1fr 320px; min-height:100vh; }
+  @media (max-width:900px) { body { grid-template-columns:1fr; } aside { border-left:0; border-top:1px solid var(--line); } main { padding:28px 20px 140px; } }
+  main { padding:40px 56px 140px; max-width:820px; }
+  a { color:inherit; }
+  .kicker { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--c); font-weight:600; }
+  h1 { font-size:32px; line-height:1.2; margin:10px 0 16px; }
+  .meta { color:var(--muted); font-size:14px; margin-bottom:22px; }
+  .meta b { color:#ffb547; font-weight:600; } .meta .hot { color:#ff5c5c; }
+  .flow { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 22px; }
+  .flow span { background:var(--card); border:1px solid var(--line); padding:10px 14px; border-radius:10px; }
+  .flow span.bad { border-color:#ff5c5c; color:#ff5c5c; }
+  .flow i { color:var(--muted); font-style:normal; font-size:20px; }
+  .context { font-size:17px; color:#c4c8d0; margin:0 0 20px; }
+  .why { font-size:15px; color:var(--muted); margin:0 0 26px; }
+  .why::before { content:"Why you: "; color:var(--text); font-weight:600; }
+  .applied { border:1px solid #3ecf8e; color:#3ecf8e; border-radius:12px; padding:14px 18px; margin-bottom:16px; }
+  .opts { display:grid; gap:10px; }
+  .opt { display:flex; gap:14px; align-items:center; padding:16px 18px; border:1px solid var(--line); border-radius:12px; background:var(--card); cursor:pointer; font:inherit; color:inherit; text-align:left; }
+  .opt:hover { border-color:#4a5060; }
+  .opt kbd { font:600 13px ui-monospace, monospace; background:#20242d; border-radius:6px; padding:3px 8px; color:var(--muted); }
+  .opt .tag { margin-left:auto; font-size:12px; color:var(--accent); }
+  .opt.sel { border-color:var(--accent); background:rgba(204,255,0,.08); }
+  .opt.sel kbd { background:var(--accent); color:#000; }
+  .own { margin-top:10px; width:100%; background:transparent; border:1px dashed var(--line); border-radius:12px; padding:14px 18px; color:var(--text); font:inherit; }
+  aside { border-left:1px solid var(--line); padding:28px 20px 140px; font-size:14px; }
+  aside .title { color:var(--muted); font-size:13px; }
+  aside h2 { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:18px 0 8px; }
+  aside ul { padding:0; margin:0; }
+  aside li { list-style:none; padding:7px 8px; border-radius:8px; cursor:pointer; display:flex; gap:8px; }
+  aside li.cur { background:var(--card); }
+  aside li.done { color:var(--muted); text-decoration:line-through; }
+  aside li .s { margin-left:auto; color:var(--accent); font:600 12px ui-monospace, monospace; white-space:nowrap; }
+  aside li .d { flex:none; width:8px; height:8px; border-radius:50%; margin-top:7px; }
+  aside details { margin-top:18px; color:var(--muted); }
+  aside details summary { cursor:pointer; font-size:12px; letter-spacing:.08em; text-transform:uppercase; }
+  aside details li { cursor:default; }
+  footer { position:fixed; left:0; right:0; bottom:0; background:#0b0c10ee; border-top:1px solid var(--line); padding:14px 56px; display:flex; gap:16px; align-items:center; backdrop-filter:blur(6px); }
+  footer code { font:14px ui-monospace, monospace; color:var(--accent); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  footer button { background:var(--accent); color:#000; border:0; border-radius:8px; padding:9px 16px; font:600 14px -apple-system, sans-serif; cursor:pointer; }
+  footer span { color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<main id="m"></main>
+<aside id="a"></aside>
+<footer><span id="cnt"></span><code id="ans"></code><button id="copy">Copy answers</button></footer>
+
+<script>
+/* ---- Fill in DATA only. Never change the layout below. ----
+ * id        unique per board, e.g. "inbox-2026-10-26"; keys the saved answers
+ * lane      decide | hands | agent | none
+ * n         number, unique; the pasted answer refers to it ("3b")
+ * headline  what is at stake, in plain words (not the ticket title)
+ * why       why the user is involved
+ * waiting   { who, days }    deadline  short text    ref, url  the source
+ * flow      [{ t, bad }] for a cause → effect chain; otherwise context: one sentence
+ * rec       your recommendation
+ * options   choices, recommended first. Omitted → "<rec> (go)" / "Skip"
+ * applied   set after the change is made; shows the item as done
+ */
+const DATA = {
+  id: "inbox-example",
+  title: "Inbox",
+  date: "Mon 26 Oct",
+  items: [
+    { n: 1, lane: "decide", ref: "ISSUE-123", url: "#",
+      headline: "Customers' payments fail when the provider omits the country",
+      why: "The owner asks whether anyone ever contacted the provider",
+      waiting: { who: "mal", days: 5 },
+      flow: [{ t: "country missing" }, { t: "fee code throws", bad: true }, { t: "payment declined" }],
+      rec: "Handle the missing country on our side and chase the provider",
+      options: ["Fix our side + chase provider", "Only chase provider", "Only fix our side"] },
+    { n: 2, lane: "hands", ref: "ISSUE-456", url: "#",
+      headline: "Create the alerts channel so on-call stops missing cases",
+      why: "Only you can create channels",
+      waiting: { who: "jem", days: 10 },
+      context: "Create the channel and send the requester its ID.",
+      options: ["Done", "Not now"] },
+    { n: 3, lane: "agent", ref: "PR #42", url: "#",
+      headline: "Your approved PR is blocked from merging",
+      rec: "Find out why and report back; merge nothing without your OK" },
+    { n: 4, lane: "none", ref: "ISSUE-789", headline: "Approval: already merged" },
+  ],
+};
+</script>
+
+<script>
+  const LANES = {
+    decide: { label: "You decide", color: "#ff5c5c" },
+    hands:  { label: "Only your hands", color: "#ffb547" },
+    agent:  { label: "Agent does it", color: "#3ecf8e" },
+  };
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+  const queue = DATA.items.filter(i => i.lane in LANES);
+  const none = DATA.items.filter(i => i.lane === 'none');
+  const KEY = 'inbox-picks:' + DATA.id;
+  const picks = JSON.parse(localStorage.getItem(KEY) || '{}');
+  const save = () => localStorage.setItem(KEY, JSON.stringify(picks));
+  const opts = i => i.options || (i.rec ? [i.rec + ' (go)', 'Skip'] : []);
+  const label = x => picks[x.n] === undefined ? '' : typeof picks[x.n] === 'string' ? '✎' : x.n + 'abcd'[picks[x.n]];
+  // Open on the first item that is neither answered nor applied.
+  let cur = Math.max(0, queue.findIndex(i => !i.applied && picks[i.n] === undefined));
+  document.title = `${DATA.title} · ${DATA.date}`;
+
+  function render() {
+    const i = queue[cur];
+    if (!i) { document.getElementById('m').innerHTML = '<h1>Nothing needs you.</h1>'; return; }
+    document.body.style.setProperty('--c', LANES[i.lane].color);
+    const flow = i.flow ? `<div class="flow">${i.flow.map(s => `<span class="${s.bad ? 'bad' : ''}">${esc(s.t)}</span>`).join('<i>→</i>')}</div>` : '';
+    const meta = [
+      i.waiting && `<b>${esc(i.waiting.who)} waiting ${esc(i.waiting.days)} days</b>`,
+      i.deadline && `<span class="hot">${esc(i.deadline)}</span>`,
+      i.ref && (i.url ? `<a href="${esc(i.url)}">${esc(i.ref)}</a>` : esc(i.ref)),
+    ].filter(Boolean).join(' · ');
+    const own = typeof picks[i.n] === 'string' ? esc(picks[i.n]) : '';
+    document.getElementById('m').innerHTML = `
+      <div class="kicker">${cur + 1} of ${queue.length} · ${LANES[i.lane].label}</div>
+      <h1>${esc(i.headline)}</h1><div class="meta">${meta}</div>
+      ${flow}${i.context ? `<p class="context">${esc(i.context)}</p>` : ''}${i.why ? `<p class="why">${esc(i.why)}</p>` : ''}
+      ${i.applied ? `<div class="applied">✓ Applied: ${esc(i.applied)}</div>` : `
+      <div class="opts">${opts(i).map((o, k) => `<button class="opt ${picks[i.n] === k ? 'sel' : ''}" onclick="pick(${k})">
+        <kbd>${'abcd'[k]}</kbd>${esc(o)}${k === 0 ? '<span class="tag">recommended</span>' : ''}</button>`).join('')}</div>
+      <input class="own" placeholder="Or type your own answer… (Enter)" value="${own}"
+        onkeydown="if(event.key==='Enter'){picks[${i.n}]=this.value;save();go(cur+1)}">`}`;
+    document.getElementById('a').innerHTML = `<div class="title">${esc(DATA.title)} · ${esc(DATA.date)}</div>` +
+      Object.entries(LANES).map(([k, l]) => {
+        const items = queue.filter(x => x.lane === k);
+        return items.length ? `<h2>${l.label} · ${items.length}</h2><ul>${items.map(x =>
+          `<li class="${x === i ? 'cur' : ''} ${x.applied ? 'done' : ''}" onclick="go(${queue.indexOf(x)})">
+          <span class="d" style="background:${l.color}"></span>${esc(x.headline)}<span class="s">${x.applied ? '✓' : label(x)}</span></li>`).join('')}</ul>` : '';
+      }).join('') +
+      (none.length ? `<details><summary>Nothing needed · ${none.length}</summary><ul>${none.map(x => `<li>${esc(x.ref)}: ${esc(x.headline)}</li>`).join('')}</ul></details>` : '');
+    const open = queue.filter(x => !x.applied);
+    const answered = open.filter(x => picks[x.n] !== undefined);
+    document.getElementById('cnt').textContent = `${answered.length}/${open.length} answered`;
+    document.getElementById('ans').textContent = answered
+      .map(x => typeof picks[x.n] === 'string' ? `${x.n}: "${picks[x.n]}"` : `${x.n}${'abcd'[picks[x.n]]}`).join('  ');
+  }
+  window.pick = k => { picks[queue[cur].n] = k; save(); render(); setTimeout(() => go(cur + 1 < queue.length ? cur + 1 : cur), 150); };
+  window.go = k => { if (k >= 0 && k < queue.length) { cur = k; render(); } };
+  document.getElementById('copy').onclick = e => {
+    navigator.clipboard.writeText(document.getElementById('ans').textContent);
+    e.target.textContent = 'Copied ✓'; setTimeout(() => e.target.textContent = 'Copy answers', 1200);
+  };
+  addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.key === 'ArrowRight') go(cur + 1);
+    if (e.key === 'ArrowLeft') go(cur - 1);
+    const i = queue[cur], k = 'abcd'.indexOf(e.key);
+    if (i && !i.applied && k >= 0 && k < opts(i).length) pick(k);
+  });
+  render();
+</script>
+</body>
+</html>
