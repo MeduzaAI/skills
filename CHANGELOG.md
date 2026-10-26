@@ -1,5 +1,15 @@
 # meduza
 
+## 2.1.0
+
+### Minor Changes
+
+- [`a519255`](https://github.com/MeduzaAI/skills/commit/a519255827899597ac0946e161505ca720a9b42c) Thanks [@mattaliev](https://github.com/mattaliev)! - Add `inbox`: research every unread notification, show a click-to-answer board from a fixed template, apply the answers and mark handled notifications read.
+
+### Patch Changes
+
+- [#6](https://github.com/MeduzaAI/skills/pull/6) [`b664ec3`](https://github.com/MeduzaAI/skills/commit/b664ec3ef96ea0b5b3b9af6f4fcf50abfaeac442) Thanks [@mattaliev](https://github.com/mattaliev)! - `inbox`: the board template's example data uses neutral names and a neutral accent colour.
+
 ## 2.0.0
 
 ### Major Changes
