@@ -34,8 +34,8 @@ simplification passes (`simplify`).
   requirements and test cases are not missing from this diff.
 - **Base**: the one the caller names, else the PR's base, else the repo's
   default branch.
-- **Axes**: all four, unless the caller names which to run (`meduza:verify`
-  asks for Tests only on the tests it generated).
+- **Axes**: all four, unless the caller names which to run (Tests only, for
+  example, on tests the caller just generated).
 - **Produces**: one report per axis in the conversation. Posting them anywhere is
   the user's separate step.
 
@@ -146,9 +146,9 @@ the axis is skipped and the report says so.
 **Tests sub-agent prompt** — include:
 
 - The diff command and commit list.
-- The test cases the plan lists for the slice, if any, else the spec. The Flows
-  only when the caller says their regression tests are in the diff
-  (`meduza:verify` does); before verify runs they do not exist yet.
+- The test cases the plan lists for the slice, if any, else the spec. The
+  flows only when the caller says their regression tests are in the diff;
+  until then those tests do not exist.
 - The testing sources from step 3.
 - The brief: "Report, per test or per planned case: (a) tautological tests:
   ones that assert what they set up, mock the unit under test, mirror the

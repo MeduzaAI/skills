@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Read before building one slice of a plan written by meduza:plan. Use when the user or a parent skill hands over a planned slice and wants it built. Produces a verified commit per touched repo, without a PR.
+description: Read before building one slice of an approved plan. Use when the user or a parent skill hands over a planned slice and wants it built. Produces a verified commit per touched repo, without a PR.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
@@ -15,7 +15,7 @@ carry.
 ## Inputs
 
 - **Consumes**: a plan (a tracker document or a file) and the slice to
-  build. A spec or an issue is not a plan; route it to `meduza:plan` first.
+  build. A spec or an issue is not a plan; it needs planning first.
 - **From the caller, when given**: the base branch to branch from (for a
   stack) and whether to build in a worktree. Not given → the repo's default
   branch, in the current working copy.
@@ -42,7 +42,7 @@ prompt. Write the prompt yourself; it must get across:
    the work on disk uncommitted, return Blocked with 2–3 options.
 3. **Write the tests the slice needs**: unit tests for the logic it adds or
    changes, in the repo's test layout, where its standards say that kind of
-   code is tested. Flows' regression tests are `meduza:verify`'s.
+   code is tested. The flows' regression tests are not part of this step.
 4. **Verify fully, per repo**: the lint, typecheck and test commands the repo
    documents. Never guess a command. Fix
    until green. If the environment cannot run the tests (missing service,

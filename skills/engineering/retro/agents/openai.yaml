@@ -2,4 +2,4 @@ interface:
   display_name: "Retro"
   short_description: "Turn review comments and corrections into fixes upstream"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

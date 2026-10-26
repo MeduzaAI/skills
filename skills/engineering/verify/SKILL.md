@@ -16,7 +16,7 @@ checks that the assembled change behaves as asked on a real deployment.
 
 ## Inputs
 
-- **Consumes**: the task and its saved plan from `meduza:plan`, with the
+- **Consumes**: the task and its saved plan, with the
   slice's **flows**, the branch, its worktree and its draft PR, from the
   conversation or the calling skill. Missing → ask; never guess from the
   branch name.

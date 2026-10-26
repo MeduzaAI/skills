@@ -5,10 +5,10 @@ description: Read before building one slice of an approved plan into a pull requ
 
 # Build Slice
 
-Take one slice of a plan from `meduza:plan` to a draft PR the user can check
+Take one slice of an approved plan to a draft PR the user can check
 against the plan: built, reviewed, and shown working. Usually run by a
-fresh worker that `meduza:build` dispatched. Each phase runs its own fresh
-agents; this one sequences them and carries pointers.
+fresh worker. Each phase runs its own fresh agents; this one sequences them
+and carries pointers.
 
 Nobody is there to ask. A question the plan does not answer is returned,
 never decided here.

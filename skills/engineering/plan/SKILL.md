@@ -19,8 +19,8 @@ There is no template. Leave out whatever does not apply.
 
 ## Inputs
 
-- **Consumes**: an existing issue or spec, named in the conversation or
-  passed by `meduza:build`. Missing → ask.
+- **Consumes**: an existing issue or spec, named in the conversation or by
+  the caller. Missing → ask.
 - **Produces**: the approved plan, saved where the issue or spec lives (a
   document on the issue or project; beside a repo-file spec, uncommitted).
 
@@ -34,11 +34,23 @@ answers, where they apply:
   reason. A table.
 - **Facts**: each external contract a slice relies on, with its primary
   source. No "confirm during build".
-- **Slices**: per slice, what it delivers; its **shape** from `show-me` (a
-  file-tree diff, plus a call-tree or component diff when control flow
-  changes, plus signatures or fields an agent could get wrong); and its
-  **flows**: how it is checked, as steps with expected results, the error
-  cases, and the test layer that will keep it.
+- **Architecture**, when the change adds or changes components, contracts
+  or data, drawn with `show-me`:
+  - *Components and flow*: a sequence diagram of who calls whom, then one
+    line per component on what it owns.
+  - *Contracts*: each endpoint's method, path, request and response shape;
+    each event.
+  - *Data*: new or changed tables and fields, and new query shapes.
+  - *States*: a state diagram with every transition, when there are states.
+- **Slices**: per slice, what it delivers, then its **program design** from
+  `show-me`:
+  - a file-tree diff, with a note per file on what it is responsible for;
+  - a call-tree diff for any orchestration or control-flow change;
+  - types and signatures of the key new functions, the ones an agent might
+    otherwise get wrong.
+
+  And its **flows**: how it is checked, as steps with expected results, the
+  error cases, and the test layer that will keep it.
 - **Stacks**, when there is more than one slice: which slices stack on which,
   and which stacks are independent.
 

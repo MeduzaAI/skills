@@ -82,15 +82,16 @@ next one is built.
 
 ```
 build
-├─ plan                      with you: decisions, slices, how each is checked
-└─ per slice: build-slice    a fresh worker
-   ├─ implement
-   ├─ code-review
-   └─ verify                 → draft PR, then your checkpoint
+├─ plan                      with you: architecture, slices, program design
+├─ per slice: build-slice    a fresh worker
+│  ├─ implement
+│  ├─ code-review
+│  └─ verify                 → draft PR, then your checkpoint
+└─ retro                     a fresh worker, after the last checkpoint
 ```
 
-`brainstorm` comes before, while the idea is still open; `retro` after, on
-the merged PRs.
+Each skill calls only the ones below it. `brainstorm` comes before, while
+the idea is still open; `retro` also runs on its own, on any session or PR.
 
 Company process (statuses, labels, templates, QA) is never in these skills:
 they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
@@ -108,7 +109,7 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 - [code-review](skills/engineering/code-review/SKILL.md): review a change against the repo's standards and its spec.
 - [research](skills/engineering/research/SKILL.md): investigate a question against primary sources.
 - [show-me](skills/engineering/show-me/SKILL.md): explain code flow or a change with visuals.
-- [retro](skills/engineering/retro/SKILL.md) (user-invoked): turn review comments and corrections into fixes upstream.
+- [retro](skills/engineering/retro/SKILL.md): turn review comments and corrections into fixes upstream.
 
 ### Productivity
 

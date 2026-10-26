@@ -69,14 +69,23 @@ The user checks the PRs, then:
 
 Code the user accepted differs from the plan → `meduza:plan` Revise before
 the next dependent slice starts. A push to a lower PR once slices sit on it
-(rework, `/autofix-pr`) → restack them: `gh stack rebase`, then submit; without `gh stack`, rebase
-each branch onto the one below and force-push it.
+(rework, `/autofix-pr`) → restack them: `gh stack rebase`, then submit;
+without `gh stack`, rebase each branch onto the one below and force-push
+it.
+
+## 4. Retro
+
+After the last checkpoint passes, one fresh subagent runs `meduza:retro`
+as a worker, given this session (its project directory and session id),
+the PRs and the plan, so it reads the run cold instead of from this heavy
+context. Show the user the ranked improvements it returns and ask which to
+apply; a new `retro` worker applies the ones they pick.
 
 ## Report
 
 One table: slice, stack, repo, PR, status, checkpoint rounds. Then what is
-blocked and why, and the next step: which stack to merge first, and
-`meduza:retro` on the PRs once they are merged.
+blocked and why, where the retro landed (its report and each applied
+change), and the next step: which stack to merge first.
 
 ## Common mistakes
 
