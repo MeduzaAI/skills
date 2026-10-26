@@ -87,7 +87,7 @@ build
 │  ├─ implement
 │  ├─ code-review
 │  └─ verify                 → draft PR, then your checkpoint
-└─ retro                     a fresh worker, after the last checkpoint
+└─ retro                     with you, after the last checkpoint
 ```
 
 Each skill calls only the ones below it. `brainstorm` comes before, while

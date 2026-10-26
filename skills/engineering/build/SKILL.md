@@ -75,11 +75,8 @@ it.
 
 ## 4. Retro
 
-After the last checkpoint passes, one fresh subagent runs `meduza:retro`
-as a worker, given this session (its project directory and session id),
-the PRs and the plan, so it reads the run cold instead of from this heavy
-context. Show the user the ranked improvements it returns and ask which to
-apply; a new `retro` worker applies the ones they pick.
+After the last checkpoint passes, run `meduza:retro` here, with the user,
+on this session, the PRs and the plan.
 
 ## Report
 

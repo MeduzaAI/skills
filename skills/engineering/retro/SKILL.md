@@ -22,12 +22,6 @@ or more sessions, or several of these. Nothing named → the current session.
 - **Produces**: a dated report and, for the improvements the user approves,
   the changes themselves in the repos that own them.
 
-| Condition | Behaviour |
-|---|---|
-| The user is in the conversation | Steps 1–4. |
-| Run as a worker, nobody to ask | Stop after step 3; return the ranked list and the report path. |
-| Run as a worker with the user's picks | Step 4 for those picks only. |
-
 ## Goal
 
 Done when every comment and correction in the sources is classified and
