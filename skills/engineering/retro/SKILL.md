@@ -1,7 +1,6 @@
 ---
 name: retro
-description: Read before reflecting on how a piece of agent-built work went, from its review comments or its sessions. Use when the user wants the same review comment or correction never to be needed again. Produces ranked improvements, each routed to the check, standard, skill or plan step that owns it.
-disable-model-invocation: true
+description: Read before reflecting on how a piece of agent-built work went, from its review comments or its sessions. Use when the user, or a skill finishing a run, wants the same review comment or correction never to be needed again. Produces ranked improvements, each routed to the check, standard or skill that owns it.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
@@ -41,6 +40,8 @@ Read primary sources, not memories of them:
   waits for information.
 - **The plan and the spec** the work was built from, to tell "the builder
   ignored a decision" from "nobody made the decision".
+- **The skills the session used**, read from the sources themselves (the
+  skills invoked, the instructions loaded), and where each one lives.
 
 Large sources → parallel subagents, one per PR or session, each writing its
 findings to a file; this session reads the files.
@@ -55,9 +56,9 @@ For each comment or correction, decide what should have prevented it:
 | A judgement rule (structure, error handling, test shape, "follow the sibling") | The repo's standards that its reviewer loads: its review checklist or path rules. `AGENTS.md`/`CLAUDE.md` holds only navigation pointers. |
 | A rule that exists but was not applied | Enforcement, not a new rule: wire it into the reviewer or a check, or make it discoverable from the paths it governs. |
 | A rule the repo documents the opposite way | Ask the user for the ruling, then fix the document. |
-| A product or technical decision made in review | The planning step that should have asked it: a missing class of question in `meduza:plan`, or a `meduza:build` checkpoint that should have caught it. If the project is still running, add the answer to its plan's Decisions. |
-| A PR boundary problem (too small, too big, wrong stack) | The slicing and stacking rules in `meduza:plan`. |
-| A skill behaving wrongly | The skill, rebuilt through `meduza:skillify`. |
+| A product or technical decision made in review | The planning step that should have asked it: a missing class of question in the planning skill the session used, or a checkpoint that should have caught it. If the work is still running, add the answer to its plan's decisions. |
+| A PR boundary problem (too small, too big, wrong stack) | The slicing and stacking rules of the planning skill the session used. |
+| A skill behaving wrongly | The skill that did it, rebuilt in its own repo, through the skill-authoring skill when one is installed. |
 | Information the agent could not find or reach | A navigation pointer, a doc, or access (logs, read-only service access). |
 | An expensive or repeated tool call | Tooling: a script, a better command. |
 
@@ -80,7 +81,8 @@ otherwise `~/.agents/retros/<project-dir>/YYYY-MM-DD-<slug>.md`.
 Present the ranked list and ask which to action. Then each in its owner:
 a repo change on its own branch with a draft PR in that repo (one repo, one
 PR; the same branch name when one change spans repos); a skill change via
-`meduza:skillify`. Nothing is changed before the user picks it.
+the skill-authoring skill when one is installed. Nothing is changed before
+the user picks it.
 
 ## Report
 
