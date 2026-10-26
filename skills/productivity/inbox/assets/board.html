@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Inbox</title>
 <style>
-  :root { --bg:#0f1115; --card:#171a21; --line:#262a33; --text:#e8eaee; --muted:#8b919c; --accent:#ccff00; }
+  :root { --bg:#0f1115; --card:#171a21; --line:#262a33; --text:#e8eaee; --muted:#8b919c; --accent:#7aa2ff; }
   * { box-sizing:border-box; }
   body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 -apple-system, "Inter", "Segoe UI", sans-serif; display:grid; grid-template-columns:1fr 320px; min-height:100vh; }
   @media (max-width:900px) { body { grid-template-columns:1fr; } aside { border-left:0; border-top:1px solid var(--line); } main { padding:28px 20px 140px; } }
@@ -28,7 +28,7 @@
   .opt:hover { border-color:#4a5060; }
   .opt kbd { font:600 13px ui-monospace, monospace; background:#20242d; border-radius:6px; padding:3px 8px; color:var(--muted); }
   .opt .tag { margin-left:auto; font-size:12px; color:var(--accent); }
-  .opt.sel { border-color:var(--accent); background:rgba(204,255,0,.08); }
+  .opt.sel { border-color:var(--accent); background:rgba(122,162,255,.1); }
   .opt.sel kbd { background:var(--accent); color:#000; }
   .own { margin-top:10px; width:100%; background:transparent; border:1px dashed var(--line); border-radius:12px; padding:14px 18px; color:var(--text); font:inherit; }
   aside { border-left:1px solid var(--line); padding:28px 20px 140px; font-size:14px; }
@@ -75,14 +75,14 @@ const DATA = {
     { n: 1, lane: "decide", ref: "ISSUE-123", url: "#",
       headline: "Customers' payments fail when the provider omits the country",
       why: "The owner asks whether anyone ever contacted the provider",
-      waiting: { who: "mal", days: 5 },
+      waiting: { who: "alex", days: 5 },
       flow: [{ t: "country missing" }, { t: "fee code throws", bad: true }, { t: "payment declined" }],
       rec: "Handle the missing country on our side and chase the provider",
       options: ["Fix our side + chase provider", "Only chase provider", "Only fix our side"] },
     { n: 2, lane: "hands", ref: "ISSUE-456", url: "#",
       headline: "Create the alerts channel so on-call stops missing cases",
       why: "Only you can create channels",
-      waiting: { who: "jem", days: 10 },
+      waiting: { who: "sam", days: 10 },
       context: "Create the channel and send the requester its ID.",
       options: ["Done", "Not now"] },
     { n: 3, lane: "agent", ref: "PR #42", url: "#",
