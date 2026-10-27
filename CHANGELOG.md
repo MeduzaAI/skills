@@ -1,5 +1,11 @@
 # meduza
 
+## 2.1.1
+
+### Patch Changes
+
+- [#7](https://github.com/MeduzaAI/skills/pull/7) [`6829af3`](https://github.com/MeduzaAI/skills/commit/6829af3a9d92890260dda6ec910abe56303f2dd1) Thanks [@mattaliev](https://github.com/mattaliev)! - `inbox`: reply drafts come as an HTML document (`assets/drafts.html`) where the user edits each reply in place, marks it Send or Skip, and pastes back one answer block.
+
 ## 2.1.0
 
 ### Minor Changes
