@@ -47,14 +47,18 @@ Stacks with no dependency between them run in parallel.
 ## 3. Checkpoint
 
 After each stack, and once after the first slice of the first stack, so
-the tracer bullet is checked before anything is built on it. Copy
-`assets/checkpoint.html` next to the user's work, fill its `DATA` block from
-the workers' reports and nothing else, then open it. The comment above
-`DATA` lists the fields: per slice its PR and status, the planned shape
-beside the built one, what was decided beyond the plan, its flows, or the
-question it returned. PRs that match the plan collapse into one item. In
-chat, say only that the checkpoint is open and to paste the answer line
-when done.
+the tracer bullet is checked before anything is built on it. From the
+workers' reports, write `checkpoint.yaml` next to the user's work in the
+shape of `assets/checkpoint.example.yaml`, whose comments describe the
+fields: per slice its PR and status, the planned shape beside the built
+one, what was decided beyond the plan, its flows, or the question it
+returned; a new `id` per checkpoint. Render it with
+`node <this skill's dir>/scripts/render.mjs checkpoint.yaml` (Node 18+) and
+open the HTML it prints; the script fills `assets/checkpoint.html`, so
+don't read it. Without Node, write the same data as JSON, multi-line text
+as lists of lines, in place of that template's `/*DATA*/null/*/DATA*/`
+marker. PRs that match the plan collapse into one item. In chat, say only
+that the checkpoint is open and to paste the answer line when done.
 
 Then hand off `/autofix-pr` (a Claude Code command), one PR at a time,
 bottom to top: the session enters the PR's worktree, the user runs it or
@@ -102,3 +106,5 @@ change), and the next step: which stack to merge first.
 - Building on after accepting a deviation without Revise.
 - The checkpoint written out in chat → `checkpoint.html`; chat says only
   that it is open.
+- Reading or hand-editing `checkpoint.html` → write `checkpoint.yaml` and
+  render it.

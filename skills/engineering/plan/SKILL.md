@@ -22,7 +22,8 @@ There is no template. Leave out whatever does not apply.
 - **Consumes**: an existing issue or spec, named in the conversation or by
   the caller. Missing → ask.
 - **Produces**: the approved plan, saved where the issue or spec lives (a
-  document on the issue or project; beside a repo-file spec, uncommitted).
+  document on the issue or project; beside a repo-file spec, uncommitted),
+  and the `plan.yaml` it is rendered from.
 
 ## Goal
 
@@ -92,14 +93,17 @@ stack.
 
 ## 4. Approve and save
 
-Copy `assets/plan.html` next to the user's work, fill its `DATA` block with
-exactly what will be saved and nothing else, then open it. The comment
-above `DATA` lists the fields. Decisions go in as settled in step 2, so the
-document shows them locked. In chat, say only that the plan is open and to
-paste the answer block when done.
+Write the plan once, as `plan.yaml` next to the user's work, in the shape of
+`assets/plan.example.yaml`; its comments describe each field. Decisions go
+in as settled in step 2, so the page shows them locked. Render it with
+`node <this skill's dir>/scripts/render.mjs plan.yaml` (Node 18+) and open
+the `plan.html` it prints. The script fills `assets/plan.html`; don't read
+it. Without Node, write the same data as JSON, multi-line text as lists of
+lines, in place of that template's `/*DATA*/null/*/DATA*/` marker. In chat,
+say only that the plan is open and to paste the answer block when done.
 
 The user comments on or edits any block, marks pieces ok, and ends with a
-verdict. Apply the answer block:
+verdict. Apply the answer block to `plan.yaml`:
 
 - `S1.files 💬 "…"`: a comment on that block. Change the plan to meet it,
   or answer it if it asks something.
@@ -109,23 +113,27 @@ verdict. Apply the answer block:
   as written, changing only what they asked.
 - `S2 ok`: that piece is accepted as shown.
 - `approve` with no comments or edits approves the plan as a whole.
-  Anything else: apply it, then open a fresh copy (new `id`, each changed
-  block's old text in `before`) for another verdict.
+  Anything else: apply it, give the YAML a new `id`, put each changed
+  block's old text under `before` (only this round's), and render again
+  for another verdict.
 
 Then one fresh agent checks the approved plan against the issue or spec and
 the standards for anything a builder would have to guess. Show what that
 changes the same way, then save.
 
-The document is where the plan is reviewed, not where it lives: save the
-plan as text where Inputs says.
+The page is where the plan is reviewed, not where it lives. The saved plan
+is `render.mjs plan.yaml --md`, saved where Inputs says, so the content is
+written once.
 
 ## Revise
 
 When the user accepts code that differs from its slice's plan, or asks for
-a change: update that slice to what was built, then every later slice that
-relies on what changed. Show only the changed pieces in `plan.html`, with
-`before` set, and the accepted deviation as a locked decision; approve;
-save. A slice is never built against a plan the code already contradicts.
+a change: in `plan.yaml` (gone → rebuild it from the saved plan), update
+that slice to what was built, then every later slice that relies on what
+changed, and add the accepted deviation as a locked decision. New `id`,
+the changed blocks' old text under `before`; render, approve, save the
+`--md` again. A slice is never built against a plan the code already
+contradicts.
 
 ## Common mistakes
 
@@ -136,5 +144,7 @@ save. A slice is never built against a plan the code already contradicts.
 - Narrowing scope silently → a spec gap; ask, write it back.
 - The plan pasted in chat as Markdown for approval → `plan.html`; chat says
   only that it is open.
+- Reading or hand-editing `plan.html`, or writing the plan a second time as
+  Markdown → edit `plan.yaml` and render; `--md` is the saved plan.
 - A decision left open in the document → settle it in step 2; the document
   shows it locked.

@@ -1,0 +1,254 @@
+# retro.yaml: the retro's data, written once. Copy this shape, not this content.
+#   node <retro skill dir>/scripts/render.mjs retro.yaml        → retro.html, the review page
+#   node <retro skill dir>/scripts/render.mjs retro.yaml --md   → the Markdown report that gets saved
+# Leave out any optional field that does not apply. Multi-line text goes in a
+# block scalar (|), written as it should read. Quote a one-line value that
+# contains ": " or " #".
+# A new round is this file edited: a new id, round + 1, round and previous on
+# the reworked themes, decided on the themes settled earlier.
+
+id: retro-ISSUE-123-r2         # unique per retro and round; keys the page's saved answers
+title: "Retro · acme/api #142 · partial refunds"
+date: Tue 27 Oct
+round: 2                       # which round of proposals this is; 1 for the first
+lesson: >-                     # the biggest lesson, one line; may use <b> and <code>
+  The repo's conventions live only in the reviewer's head: <b>11 of 15</b> asks
+  were speculative-code, money, testing and typing rules nothing in
+  <code>acme/api</code> writes down.
+report: ~/.agents/retros/api/2026-10-27-partial-refunds.md   # where the --md report is saved
+
+sources:
+  - ref: "PR #142"
+    kind: pr                   # pr | session
+    title: Add partial refunds to captured payments
+    repo: acme/api
+    url: "#"
+  - ref: "PR #143"
+    kind: pr
+    title: Show refund status on the payment page
+    repo: acme/api
+    url: "#"
+
+targets:                       # where a fix can go, for the page's pickers: the owners found while routing and the repos in play
+  - repo: acme/api
+    note: the PRs' repo
+    items:
+      - target: .agents/rules/services.md
+        kinds: [standards]     # the owner kinds this target suits
+      - target: .agents/rules/testing.md
+        kinds: [standards]
+      - target: ".agents/rules/payments.md (new, paths: app/payments/**)"
+        kinds: [standards]
+      - target: .pre-commit-config.yaml
+        kinds: [check, enforcement]
+      - target: .github/workflows/ci.yml
+        kinds: [check, enforcement]
+      - target: AGENTS.md (navigation pointer only)
+        kinds: [docs]
+  - repo: acme/skills
+    note: the team's skills plugin
+    items:
+      - target: skills/plan/SKILL.md
+        kinds: [planning, slicing, skill]
+      - target: skills/open-pr/SKILL.md
+        kinds: [enforcement, skill]
+      - target: skills/code-review/SKILL.md
+        kinds: [standards, enforcement, skill]
+
+themes:                        # ranked: recurrence first, then cost
+  - n: 1                       # the rank; what the user's answer refers to
+    headline: The agent adds code nobody asked for   # the lesson in plain words, as what the agent does wrong; never the comment text
+    recurrence: 4              # optional: comments and corrections this theme covers; defaults to the evidence count
+    owner: standards           # check | standards | enforcement | planning | slicing | skill | docs | tooling
+    repo: acme/api             # a repo from targets
+    target: .agents/rules/services.md   # where the change lands: a file path, a skill or a rule
+    cost: rework               # redesign | rework | friction
+    diff: |                    # the change exactly as it lands in target
+      ## No speculative code
+      Every branch, helper and guard has a caller that needs it.
+      - Don't special-case errors the provider already documents; let the client raise.
+      - No production helper that only tests call; put it in the fixture.
+      - Reviewer: for each new branch, helper or guard, ask "who calls this?"
+    evidence:
+      - quote: Why do we catch the provider's 404 here? Their docs already say it raises.
+        who: alex
+        at: 2026-10-20T10:12:00Z
+        where: app/payments/clients/provider.py   # a file, or "PR conversation"
+        url: "#"
+        reply: Removed the 404 branch and the custom exception; the client raises as before.   # optional: what the agent answered or changed
+      - quote: drop this
+        who: alex
+        at: 2026-10-20T10:20:00Z
+        where: app/payments/clients/provider.py
+        url: "#"
+        on: Why do we catch the provider's 404 here? Their docs already say it raises.   # optional: the earlier comment this one follows up
+      - quote: When is reset_cache() called outside tests?
+        who: sam
+        at: 2026-10-20T11:02:00Z
+        where: app/payments/services/refunds.py
+        url: "#"
+        reply: Never. Moved it into the test fixture.
+      - quote: We don't need a feature flag for an admin-only action.
+        who: alex
+        at: 2026-10-21T09:40:00Z
+        where: app/payments/services/refunds.py
+        url: "#"
+        reply: Flag removed.
+
+  - n: 2
+    headline: Whether refunds can exceed the captured amount was decided in review, not in the plan
+    recurrence: 3
+    owner: planning
+    repo: acme/skills
+    target: skills/plan/SKILL.md
+    cost: redesign
+    diff: |
+      ### Money movement
+      - What are the limits: per refund, in total, against which amount?
+      - Which states can a refund be in, and which transitions are allowed?
+      Record both answers in the plan's decisions before any code is written.
+    evidence:
+      - quote: Can the sum of refunds go over the captured amount? What happens on the second refund?
+        who: kim
+        at: 2026-10-20T14:05:00Z
+        where: app/payments/services/refunds.py
+        url: "#"
+        reply: Added a check against the captured amount minus earlier refunds.
+      - quote: What state is a refund in while the provider is still processing it?
+        who: kim
+        at: 2026-10-20T14:11:00Z
+        where: app/payments/models.py
+        url: "#"
+        reply: Added a pending state and the webhook transition to succeeded or failed.
+      - quote: This needs to be agreed with support before we merge.
+        who: jo
+        at: 2026-10-22T08:30:00Z
+        where: PR conversation
+        url: "#"
+
+  - n: 3
+    headline: "The agent handles amounts as floats: three rounds to get rid of it"
+    recurrence: 3
+    owner: check
+    repo: acme/api
+    target: .pre-commit-config.yaml
+    cost: rework
+    diff: |
+      - repo: local
+        hooks:
+          - id: no-float-money
+            name: "money is Decimal or integer minor units, never float"
+            language: pygrep
+            entry: 'float\('
+            files: ^app/payments/
+    evidence:
+      - quote: Amounts are integer cents, not floats.
+        who: alex
+        at: 2026-10-20T10:40:00Z
+        where: app/payments/services/refunds.py
+        url: "#"
+        reply: Switched to integer minor units.
+      - quote: Still a float here.
+        who: alex
+        at: 2026-10-21T09:10:00Z
+        where: app/payments/serializers.py
+        url: "#"
+        on: Amounts are integer cents, not floats.
+      - quote: And here.
+        who: sam
+        at: 2026-10-22T09:15:00Z
+        where: app/payments/views.py
+        url: "#"
+        on: Amounts are integer cents, not floats.
+    decided:                   # settled in an earlier round: arrives folded
+      round: 1
+      outcome: do              # do | skip
+
+  - n: 4
+    headline: The agent writes tests this team doesn't write
+    recurrence: 2
+    owner: standards
+    repo: acme/api
+    target: .agents/rules/testing.md
+    cost: rework
+    diff: |
+      ## What we don't unit-test
+      - One-off scripts: they are tested on staging.
+      - Thin API clients with no logic: tests mock them anyway.
+      ## Test layout
+      - One Test<Class> per class under test, holding the shared fixtures.
+    evidence:
+      - quote: We don't unit-test backfill scripts, we run them on staging.
+        who: sam
+        at: 2026-10-21T12:00:00Z
+        where: tests/scripts/test_backfill_refunds.py
+        url: "#"
+        reply: Test file removed.
+      - quote: Put these under one TestRefundService class with the fixtures inside.
+        who: sam
+        at: 2026-10-21T12:06:00Z
+        where: tests/payments/test_refunds.py
+        url: "#"
+        reply: Done.
+
+  - n: 5
+    headline: The agent's type hints ignore the house style
+    recurrence: 2
+    owner: check
+    repo: acme/api
+    target: .pre-commit-config.yaml
+    cost: friction
+    round: 2                   # the round this proposal was made in; leave out for round 1
+    diff: |
+      - repo: local
+        hooks:
+          - id: optional-not-pipe
+            name: "use Optional[T], not T | None"
+            language: pygrep
+            entry: '\|\s*None\b'
+            files: ^app/.*\.py$
+    evidence:
+      - quote: We agreed on Optional[T] instead of the pipe.
+        who: alex
+        at: 2026-10-21T15:00:00Z
+        where: app/payments/services/refunds.py
+        url: "#"
+        reply: Changed every annotation this PR adds.
+      - quote: What type is payload here? Use the client's own types.
+        who: kim
+        at: 2026-10-21T15:20:00Z
+        where: app/payments/webhooks.py
+        url: "#"
+        reply: Typed as RefundEvent from the provider's SDK.
+    previous:                  # the proposals this one replaces, and what the user said about each
+      - round: 1
+        owner: standards
+        repo: acme/api
+        target: .agents/rules/services.md
+        diff: |
+          ## Typing
+          - Use Optional[T], not T | None.
+          - Annotate parameters with the library's own types.
+        comment: >-
+          propose a lint rule instead: the agreement was already unwritten,
+          another written rule gets ignored the same way
+
+  - n: 6
+    headline: The PR description ignored the repo's template
+    recurrence: 1
+    owner: enforcement
+    repo: acme/skills
+    target: skills/open-pr/SKILL.md
+    cost: friction
+    diff: |
+      Before opening the PR:
+      - Fill only the repo's PR template; add no sections of your own.
+    evidence:
+      - quote: Shorten the description to the template, please.
+        who: jo
+        at: 2026-10-22T16:00:00Z
+        where: PR conversation
+        url: "#"
+    decided:
+      round: 1
+      outcome: skip

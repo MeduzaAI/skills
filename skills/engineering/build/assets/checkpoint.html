@@ -75,100 +75,12 @@
 <footer><span id="cnt"></span><code id="ans"></code><span id="flag"></span><button id="copy">Copy answers</button></footer>
 
 <script>
-/* ---- Fill in DATA only. Never change the layout below. ----
- * id          unique per checkpoint, e.g. "build-ISSUE-210-cp1"; keys the saved answers
- * title       what the run builds        issue { ref, url }   the issue or spec the plan came from
- * checkpoint  { stack }  the stack this checkpoint follows
- * stacks      [{ id, repo }]
- * slices      in plan order; n is the number the pasted answer refers to ("pass 1", "q4b")
- *   stack, title
- *   state     checkpoint (PR in front of the user) | blocked (worker returned a question) | built (passed earlier) | waiting
- *   status    worker report status: Done | Unproved | Failed | Blocked   (null while waiting)
- *   pr        { num, url } or null
- *   planned   { files: [lines], calls: [lines] }  the plan's shape for the slice
- *   built     same, from the worker's show-me report; null when nothing was built
- *   decisions [{ id, text, why, explains: [substrings of built-shape lines it accounts for] }]
- *             decided beyond the plan; id is run-wide ("D1"); text is plain words
- *   flows     [{ name, state: proved|broken|unwalkable, evidence: { label, url },
- *                broken only: headline (plain: what happens vs what should), why (one line),
- *                expected, actual }]
- *   question  blocked only: { text (plain), why (one line), phase, options: [2–3 strings] }
- * Matches the plan = Done, no decisions, built shape == planned shape, every flow proved.
- * Shape lines no decision explains become their own accept/reject item, id "shape<n>".
- * Answer syntax (footer):  pass 1 3   rework 2: "feedback"   q4b | q4: "own answer"   accept D1   reject D1
- *   accept → meduza:plan Revise before the next dependent slice;  reject → rework of that decision's PR.
- *   A PR can only be passed once each of its decisions is accepted (none is accepted by passing).
- */
-const DATA = {
-  id: "build-ISSUE-210-cp1",
-  title: "Partial refunds",
-  issue: { ref: "ISSUE-210", url: "#" },
-  checkpoint: { stack: 1 },
-  stacks: [
-    { id: 1, repo: "api" },
-    { id: 2, repo: "web" },
-  ],
-  slices: [
-    { n: 1, stack: 1, title: "Refund record and amount rules",
-      state: "checkpoint", status: "Done", pr: { num: 101, url: "#" },
-      planned: { files: ["api/src/refunds/refund.model.ts  new", "api/src/refunds/refund.rules.ts  new", "api/migrations/0042_refunds.sql  new"],
-                 calls: ["Refund.create(payment, amount)", "  rules.assertRefundable(payment, amount)"] },
-      built:   { files: ["api/src/refunds/refund.model.ts  new", "api/src/refunds/refund.rules.ts  new", "api/migrations/0042_refunds.sql  new"],
-                 calls: ["Refund.create(payment, amount)", "  rules.assertRefundable(payment, amount)"] },
-      decisions: [],
-      flows: [
-        { name: "A refund within the remaining amount is recorded", state: "proved", evidence: { label: "test run", url: "#" } },
-        { name: "Amount rules reject zero and negative refunds", state: "proved", evidence: { label: "test run", url: "#" } },
-      ] },
-    { n: 2, stack: 1, title: "Partial refund endpoint",
-      state: "checkpoint", status: "Unproved", pr: { num: 102, url: "#" },
-      planned: { files: ["api/src/refunds/refund.controller.ts  new", "api/src/refunds/refund.service.ts  new", "api/src/refunds/refund.routes.ts  changed"],
-                 calls: ["POST /payments/:id/refunds", "  RefundController.create", "    RefundService.refund", "      Refund.create", "      provider.refund"] },
-      built:   { files: ["api/src/refunds/refund.controller.ts  new", "api/src/refunds/refund.service.ts  new", "api/src/refunds/refund.routes.ts  changed", "api/src/refunds/idempotency.ts  new"],
-                 calls: ["POST /payments/:id/refunds", "  idempotency.check", "  RefundController.create", "    RefundService.refund", "      Refund.create", "      provider.refund"] },
-      decisions: [
-        { id: "D1", text: "A retried refund request returns the first refund instead of refunding twice",
-          why: "The web client retries on timeout; the plan did not cover retries.",
-          explains: ["idempotency"] },
-      ],
-      flows: [
-        { name: "Refund part of a captured payment", state: "proved", evidence: { label: "recording", url: "#" } },
-        { name: "A refund over the remaining amount is rejected", state: "broken",
-          headline: "A refund over the remaining amount is accepted; it should be rejected",
-          why: "€60 on a €100 payment with €50 already refunded went through.",
-          expected: "422 · \"exceeds the remaining 50.00\"", actual: "201 · refund of 60.00 created",
-          evidence: { label: "failing request", url: "#" } },
-        { name: "Refund a settled payment", state: "unwalkable", evidence: { label: "QA plan", url: "#" } },
-      ] },
-    { n: 3, stack: 1, title: "List a payment's refunds",
-      state: "checkpoint", status: "Done", pr: { num: 103, url: "#" },
-      planned: { files: ["api/src/refunds/refund.routes.ts  changed", "api/src/refunds/refund.query.ts  new"],
-                 calls: ["GET /payments/:id/refunds", "  RefundQuery.forPayment"] },
-      built:   { files: ["api/src/refunds/refund.routes.ts  changed", "api/src/refunds/refund.query.ts  new"],
-                 calls: ["GET /payments/:id/refunds", "  RefundQuery.forPayment"] },
-      decisions: [],
-      flows: [
-        { name: "A payment's refunds are listed newest first", state: "proved", evidence: { label: "recording", url: "#" } },
-      ] },
-    { n: 4, stack: 1, title: "Provider refund webhook",
-      state: "blocked", status: "Blocked", pr: null,
-      planned: { files: ["api/src/webhooks/provider-refund.handler.ts  new"],
-                 calls: ["POST /webhooks/provider", "  ProviderRefundHandler.handle", "    RefundService.settle"] },
-      built: null, decisions: [], flows: [],
-      question: {
-        text: "When the provider's refunded amount differs from ours, which one wins?",
-        why: "Fees and currency rounding can make them differ; the plan does not say. Stopped before writing code.",
-        phase: "implement",
-        options: ["Ours wins; log the difference", "The provider's wins; correct our record", "Keep both and flag the mismatch for review"],
-      } },
-    { n: 5, stack: 2, title: "Refund dialog on the payment page",
-      state: "waiting", status: null, pr: null,
-      planned: { files: ["web/src/payments/RefundDialog.vue  new"], calls: ["PaymentPage", "  RefundDialog", "    api.createRefund"] },
-      built: null, decisions: [], flows: [] },
-  ],
-};
+/* Rendered from a checkpoint.yaml (its fields: checkpoint.example.yaml beside this file) by
+ * scripts/render.mjs, which validates the YAML and writes it as JSON in place of the marker. */
+const DATA = /*DATA*/null/*/DATA*/;
 </script>
 <script>
+  if (!DATA) { document.body.innerHTML = '<p style="padding:32px;font:15px/1.5 sans-serif">Render with scripts/render.mjs: <code>node scripts/render.mjs checkpoint.yaml</code></p>'; throw new Error('Render with scripts/render.mjs'); }
   const L = 'abcd';
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const S = DATA.slices;
