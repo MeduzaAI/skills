@@ -1,6 +1,6 @@
 ---
 name: inbox
-description: Read before working through a notification inbox with the user. Use when the user wants an inbox (issue tracker, chat, email) cleared, with what needs them surfaced and the rest handled. Produces a click-to-answer board, the user's answers applied, and handled notifications marked read.
+description: Read before working through a notification inbox with the user. Use when the user wants an inbox (issue tracker, chat, email) cleared, with what needs them surfaced and the rest handled. Produces a click-to-answer board, reply drafts to approve, the answers applied, and handled notifications marked read.
 ---
 
 # Inbox
@@ -95,16 +95,30 @@ first.
 ### 5. Apply
 
 Make the changes in the source tool: assignments, states, priorities,
-labels, replies, new tasks. Write replies in the thread's language. Run
-long agent-lane work, such as drafts or reviews, in a background subagent.
+labels, new tasks. Run long agent-lane work, such as code fixes or reviews,
+in a background subagent.
 
-Outbound text (status updates, docs, messages) goes out only after the user
-approves the drafts. A draft with a gap marked "to check" never goes out
-as is. Fill the gap, cut it, or turn it into a direct ask of the named
-person, and tell the user which you did.
+Outbound text (replies, status updates, messages) goes out only after the
+user approves it. Unless they chose to apply directly, put every draft in
+one document: copy `assets/drafts.html` next to the board, fill its `DATA`
+block and nothing else, then open it. Each draft names where it goes,
+quotes the message it answers, and is written in the thread's language;
+a state change that goes with a reply (closing the issue) rides on it as
+`action`. In chat, say only that the drafts are open. The user edits in
+place, marks Send or Skip, and pastes back the answer block:
 
-After applying, set `applied` on those items in `DATA` so the board shows
-them as done.
+- `send 1 3`: post those drafts as written in `DATA`
+- `skip 5`: drop it
+- `n ✎` followed by text: post that text. It is the user's wording, so
+  change only what they asked you to, such as grammar.
+
+A draft with a gap marked "to check" never reaches the document. Fill the
+gap, cut it, or turn it into a direct ask of the named person, and tell the
+user which you did. A draft waiting on agent work (a fix still running)
+joins the document once that work reports, not as a placeholder.
+
+After applying, set `applied` on those items in the board's `DATA` so the
+board shows them as done.
 
 ### 6. Close out
 
@@ -118,6 +132,7 @@ unread and why, and anything only the user can do.
 |---|---|
 | Brief written as paragraphs or Markdown tables | The board carries the content; chat stays a few lines |
 | Restyling or rebuilding the board | Fill `DATA` only; the layout is the template |
+| Drafts pasted into chat or a Markdown file | Drafts go in `drafts.html`, where the user edits and approves them |
 | Headline copies the ticket title | Say what breaks or who is blocked |
 | Asking about something the thread already answers | Research first; options only for real decisions |
 | Marking an open item read | Read only after it is applied or confirmed resolved |
