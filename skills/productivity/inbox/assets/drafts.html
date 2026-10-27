@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drafts</title>
+<style>
+  :root { --bg:#0f1115; --card:#171a21; --line:#262a33; --text:#e8eaee; --muted:#8b919c; --accent:#7aa2ff; --ok:#3ecf8e; --skip:#ff5c5c; --warn:#ffb547; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 -apple-system, "Inter", "Segoe UI", sans-serif; }
+  main { max-width:860px; margin:0 auto; padding:40px 24px 200px; }
+  h1 { font-size:28px; margin:0 0 4px; } .sub { color:var(--muted); margin-bottom:28px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin-bottom:18px; }
+  .card.ok { border-color:var(--ok); } .card.skip { opacity:.45; }
+  .head { display:flex; gap:10px; align-items:baseline; font-size:14px; color:var(--muted); margin-bottom:12px; }
+  .head b { color:var(--text); font-size:15px; } .head a { margin-left:auto; color:var(--accent); }
+  .to { border-left:3px solid var(--line); padding:4px 12px; color:var(--muted); font-size:14px; margin-bottom:12px; white-space:pre-wrap; }
+  .to b { color:#c4c8d0; }
+  textarea { width:100%; min-height:90px; background:var(--bg); color:var(--text); border:1px solid var(--line); border-radius:10px;
+    padding:12px 14px; font:16px/1.55 -apple-system, sans-serif; resize:vertical; }
+  textarea:focus { outline:none; border-color:var(--accent); }
+  .row { display:flex; gap:10px; margin-top:12px; align-items:center; font-size:13px; color:var(--muted); }
+  .row button { font:600 13px -apple-system, sans-serif; border-radius:8px; padding:7px 14px; cursor:pointer; border:1px solid var(--line); background:#20242d; color:var(--text); }
+  .row button.on.okb { background:var(--ok); color:#000; border-color:var(--ok); }
+  .row button.on.skb { background:var(--skip); color:#000; border-color:var(--skip); }
+  .edited { color:var(--warn); } .action { color:var(--warn); margin-left:auto; }
+  footer { position:fixed; left:0; right:0; bottom:0; background:#0b0c10ee; border-top:1px solid var(--line); padding:12px 24px; display:flex; gap:16px; align-items:flex-start; backdrop-filter:blur(6px); }
+  footer pre { flex:1; margin:0; max-height:110px; overflow:auto; font:13px ui-monospace, monospace; color:var(--accent); white-space:pre-wrap; }
+  footer button { background:var(--accent); color:#000; border:0; border-radius:8px; padding:9px 16px; font:600 14px -apple-system, sans-serif; cursor:pointer; }
+  footer span { color:var(--muted); font-size:13px; min-width:110px; }
+</style>
+</head>
+<body>
+<main id="m"></main>
+<footer><span id="cnt"></span><pre id="ans"></pre><button id="copy">Copy answers</button></footer>
+
+<script>
+/* ---- Fill in DATA only. Never change the layout below. ----
+ * id        unique per document, e.g. "drafts-2026-10-27"; keys the saved edits
+ * n         the board item number this reply belongs to; unique here
+ * ref       the source: issue key, PR, channel or DM
+ * where     tool and placement, e.g. "Chat · thread reply", "Tracker · reply in alex's thread"
+ * url       link to the thread
+ * to        { who, text }: the message being answered, quoted short
+ * text      the draft reply, in the thread's language; \n for line breaks
+ * action    optional: a state change that goes with the reply ("then: close the issue")
+ * optional  true for a reply the user did not explicitly ask for
+ */
+const DATA = {
+  id: "drafts-example",
+  title: "Reply drafts",
+  date: "Mon 26 Oct",
+  items: [
+    { n: 1, ref: "ISSUE-123", where: "Tracker · reply in alex's thread", url: "#",
+      to: { who: "alex", text: "Did anyone ever contact the provider about the missing country?" },
+      text: "Not yet. We'll handle the missing country on our side this week, and I've asked sam to raise it with the provider." },
+    { n: 3, ref: "#payments", where: "Chat · thread reply", url: "#", action: "then: close ISSUE-456",
+      to: { who: "sam", text: "Is this still needed, or can we close it?" },
+      text: "Close it: the cause was found and the fix shipped." },
+    { n: 5, ref: "ISSUE-789", where: "Tracker · reply", url: "#", optional: true,
+      to: { who: "kim", text: "Any update here?" },
+      text: "Parked for now, it isn't in use yet." },
+  ],
+};
+</script>
+
+<script>
+  const KEY = 'inbox-drafts:' + DATA.id;
+  const st = JSON.parse(localStorage.getItem(KEY) || '{}');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
+  const edited = i => st[i.n]?.text !== undefined && st[i.n].text !== i.text;
+  document.title = `${DATA.title} · ${DATA.date}`;
+  document.getElementById('m').innerHTML = `<h1>${esc(DATA.title)}</h1><div class="sub">${esc(DATA.date)} · edit in place, then Send or Skip each one</div>` +
+    DATA.items.map(i => `
+    <div class="card" id="c${i.n}">
+      <div class="head"><b>${i.n} · ${esc(i.ref)}</b>${esc(i.where)}${i.optional ? ' · optional' : ''}${i.url ? `<a href="${esc(i.url)}" target="_blank">open ↗</a>` : ''}</div>
+      ${i.to ? `<div class="to"><b>${esc(i.to.who)}:</b> ${esc(i.to.text)}</div>` : ''}
+      <textarea data-n="${i.n}">${esc(st[i.n]?.text ?? i.text)}</textarea>
+      <div class="row"><button class="okb" data-a="ok" data-n="${i.n}">Send</button><button class="skb" data-a="skip" data-n="${i.n}">Skip</button>
+        <span class="edited" id="e${i.n}"></span>${i.action ? `<span class="action">${esc(i.action)}</span>` : ''}</div>
+    </div>`).join('');
+  document.querySelectorAll('textarea').forEach(t => {
+    const fit = () => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 2 + 'px'; };
+    fit(); t.oninput = () => { fit(); (st[t.dataset.n] ??= {}).text = t.value; save(); };
+  });
+  document.querySelectorAll('.row button').forEach(b => b.onclick = () => {
+    const s = (st[b.dataset.n] ??= {});
+    if (b.dataset.a === 'ok') { s.ok = !s.ok; s.skip = false; } else { s.skip = !s.skip; s.ok = false; }
+    save();
+  });
+  // Answer block: "send 1 3" posts as drafted, "skip 5" drops, "n ✎" + full text posts the edited version.
+  function answers() {
+    const send = [], skip = [], edits = [];
+    for (const i of DATA.items) {
+      const s = st[i.n] || {};
+      if (s.skip) skip.push(i.n);
+      else if (s.ok) edited(i) ? edits.push(`${i.n} ✎\n${s.text}`) : send.push(i.n);
+    }
+    return [send.length && `send ${send.join(' ')}`, skip.length && `skip ${skip.join(' ')}`, ...edits].filter(Boolean).join('\n');
+  }
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(st));
+    for (const i of DATA.items) {
+      const s = st[i.n] || {}, c = document.getElementById('c' + i.n);
+      c.className = 'card' + (s.ok ? ' ok' : '') + (s.skip ? ' skip' : '');
+      c.querySelector('.okb').classList.toggle('on', !!s.ok); c.querySelector('.skb').classList.toggle('on', !!s.skip);
+      document.getElementById('e' + i.n).textContent = edited(i) ? '✎ edited' : '';
+    }
+    const done = DATA.items.filter(i => st[i.n]?.ok || st[i.n]?.skip).length;
+    document.getElementById('cnt').textContent = `${done}/${DATA.items.length} decided`;
+    document.getElementById('ans').textContent = answers();
+  }
+  document.getElementById('copy').onclick = e => {
+    navigator.clipboard.writeText(document.getElementById('ans').textContent);
+    e.target.textContent = 'Copied ✓'; setTimeout(() => e.target.textContent = 'Copy answers', 1200);
+  };
+  save();
+</script>
+</body>
+</html>
