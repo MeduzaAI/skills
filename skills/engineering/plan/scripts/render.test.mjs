@@ -12,7 +12,8 @@ import { parseYaml, YamlError, POS, validate, opt, inject, MARK, SKILL } from '.
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const script = join(here, 'render.mjs');
-const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);
+const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);   // the shape agents copy
+const demo = join(here, '..', 'assets', `${SKILL.name}.demo.yaml`);         // the full sample
 const template = join(here, '..', 'assets', `${SKILL.name}.html`);
 const cli = (...args) => spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
 const tmp = () => mkdtempSync(join(tmpdir(), 'render-test-'));
@@ -212,9 +213,20 @@ test('the template, opened un-rendered, says how to render it', () => {
 });
 
 // ---- plan ----
-test('the example renders into the page', () => {
+test('the example validates and renders into a page that builds itself', () => {
   const dir = tmp(), yaml = join(dir, 'plan.yaml');
   copyFileSync(example, yaml);
+  const r = cli(yaml);
+  assert.equal(r.status, 0, r.stderr);
+  const page = runPage(readFileSync(r.stdout.trim(), 'utf8'));
+  assert.equal(page.error, undefined, page.error?.stack);
+  assert.match(page.els.app.innerHTML, /\S/);
+  assert.equal(cli(example, '--md').status, 0);
+});
+
+test('the demo renders into the page', () => {
+  const dir = tmp(), yaml = join(dir, 'plan.yaml');
+  copyFileSync(demo, yaml);
   const r = cli(yaml);
   assert.equal(r.status, 0, r.stderr);
   const out = r.stdout.trim();
@@ -230,7 +242,7 @@ test('the example renders into the page', () => {
 });
 
 test('--md is the saved plan, with only the sections present', () => {
-  const r = cli(example, '--md');
+  const r = cli(demo, '--md');
   assert.equal(r.status, 0, r.stderr);
   for (const h of ['# Partial refunds', '## What and why', '## Decisions', '## Facts', '## Architecture', '### Components and flow',
     '## Slices', '### S1. Partial refund endpoint', '**Files**', '**Call tree**', '**Signatures**', '**Flow 1: Partial refund is created**', '## Stacks'])
@@ -246,12 +258,12 @@ test('--md is the saved plan, with only the sections present', () => {
 
 test('a bad plan fails with the line and field of each problem', () => {
   const dir = tmp(), yaml = join(dir, 'plan.yaml');
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('    title: Refund dialog\n', ''));
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('    title: Refund dialog\n', ''));
   const r = cli(yaml);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /plan\.yaml:\d+: slices\[2\]: missing|plan\.yaml:\d+: slices\[2\]\.title: missing/);
   assert.ok(!existsSync(join(dir, 'plan.html')));
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('title: Refund status from webhook\n    after: [S1]', 'title: Refund status from webhook\n    after: [S9]')
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('title: Refund status from webhook\n    after: [S1]', 'title: Refund status from webhook\n    after: [S9]')
     + 'before:\n  S7.files: x\n');
   const r2 = cli(yaml);
   assert.equal(r2.status, 1);

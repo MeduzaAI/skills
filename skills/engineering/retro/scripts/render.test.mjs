@@ -12,7 +12,8 @@ import { parseYaml, YamlError, POS, validate, opt, inject, MARK, SKILL } from '.
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const script = join(here, 'render.mjs');
-const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);
+const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);   // the shape agents copy
+const demo = join(here, '..', 'assets', `${SKILL.name}.demo.yaml`);         // the full sample
 const template = join(here, '..', 'assets', `${SKILL.name}.html`);
 const cli = (...args) => spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
 const tmp = () => mkdtempSync(join(tmpdir(), 'render-test-'));
@@ -212,9 +213,20 @@ test('the template, opened un-rendered, says how to render it', () => {
 });
 
 // ---- retro ----
-test('the example renders into the page', () => {
+test('the example validates and renders into a page that builds itself', () => {
   const dir = tmp(), yaml = join(dir, 'retro.yaml');
   copyFileSync(example, yaml);
+  const r = cli(yaml);
+  assert.equal(r.status, 0, r.stderr);
+  const page = runPage(readFileSync(r.stdout.trim(), 'utf8'));
+  assert.equal(page.error, undefined, page.error?.stack);
+  assert.match(page.els.m.innerHTML, /\S/);
+  assert.equal(cli(example, '--md').status, 0);
+});
+
+test('the demo renders into the page', () => {
+  const dir = tmp(), yaml = join(dir, 'retro.yaml');
+  copyFileSync(demo, yaml);
   const r = cli(yaml);
   assert.equal(r.status, 0, r.stderr);
   const out = r.stdout.trim();
@@ -231,7 +243,7 @@ test('the example renders into the page', () => {
 });
 
 test('--md is the saved report: ranked themes, evidence, owner, change', () => {
-  const r = cli(example, '--md');
+  const r = cli(demo, '--md');
   assert.equal(r.status, 0, r.stderr);
   for (const h of ['# Retro · acme/api #142 · partial refunds', '## 1. The agent adds code nobody asked for', '## 6. The PR description ignored the repo\'s template',
     '> Why do we catch the provider\'s 404 here? Their docs already say it raises.', '**Owner:** Review standards · `.agents/rules/services.md` in acme/api', '```yaml'])
@@ -243,7 +255,7 @@ test('--md is the saved report: ranked themes, evidence, owner, change', () => {
 
 test('a bad retro fails with the line and field of each problem', () => {
   const dir = tmp(), yaml = join(dir, 'retro.yaml');
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('owner: planning', 'owner: plans').replace('    cost: redesign\n', ''));
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('owner: planning', 'owner: plans').replace('    cost: redesign\n', ''));
   const r = cli(yaml);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /retro\.yaml:\d+: themes\[1\]\.owner: expected one of: check, standards/);
@@ -252,7 +264,7 @@ test('a bad retro fails with the line and field of each problem', () => {
 
 test('a new round is the same file edited and rendered again', () => {
   const dir = tmp(), yaml = join(dir, 'retro.yaml');
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('id: retro-ISSUE-123-r2', 'id: retro-ISSUE-123-r3').replace(/^round: 2/m, 'round: 3')
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('id: retro-ISSUE-123-r2', 'id: retro-ISSUE-123-r3').replace(/^round: 2/m, 'round: 3')
     + '') ;
   assert.equal(cli(yaml).status, 0);
   assert.ok(readFileSync(join(dir, 'retro.html'), 'utf8').includes('"id":"retro-ISSUE-123-r3","title"'));

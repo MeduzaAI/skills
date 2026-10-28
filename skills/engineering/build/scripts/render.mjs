@@ -3,6 +3,7 @@
 // the checkpoint page ../assets/checkpoint.html, written next to the YAML.
 // Node 18+, no dependencies.
 //   node render.mjs checkpoint.yaml [-o <out>]
+// Preview with the full sample: node render.mjs ../assets/checkpoint.demo.yaml -o /tmp/checkpoint.html
 
 // ==== shared: YAML subset parser, validator, page injection, CLI ============
 // Byte-identical in the plan, build and retro skills' scripts/render.mjs.

@@ -3,6 +3,7 @@
 // page ../assets/plan.html, written next to the YAML, or with --md into the
 // Markdown plan that gets saved. Node 18+, no dependencies.
 //   node render.mjs plan.yaml [--md] [-o <out>]
+// Preview with the full sample: node render.mjs ../assets/plan.demo.yaml -o /tmp/plan.html
 
 // ==== shared: YAML subset parser, validator, page injection, CLI ============
 // Byte-identical in the plan, build and retro skills' scripts/render.mjs.

@@ -12,7 +12,8 @@ import { parseYaml, YamlError, POS, validate, opt, inject, MARK, SKILL } from '.
 
 const here = fileURLToPath(new URL('.', import.meta.url));
 const script = join(here, 'render.mjs');
-const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);
+const example = join(here, '..', 'assets', `${SKILL.name}.example.yaml`);   // the shape agents copy
+const demo = join(here, '..', 'assets', `${SKILL.name}.demo.yaml`);         // the full sample
 const template = join(here, '..', 'assets', `${SKILL.name}.html`);
 const cli = (...args) => spawnSync(process.execPath, [script, ...args], { encoding: 'utf8' });
 const tmp = () => mkdtempSync(join(tmpdir(), 'render-test-'));
@@ -212,9 +213,19 @@ test('the template, opened un-rendered, says how to render it', () => {
 });
 
 // ---- checkpoint ----
-test('the example renders into the page', () => {
+test('the example validates and renders into a page that builds itself', () => {
   const dir = tmp(), yaml = join(dir, 'checkpoint.yaml');
   copyFileSync(example, yaml);
+  const r = cli(yaml);
+  assert.equal(r.status, 0, r.stderr);
+  const page = runPage(readFileSync(r.stdout.trim(), 'utf8'));
+  assert.equal(page.error, undefined, page.error?.stack);
+  assert.match(page.els.root.innerHTML, /\S/);
+});
+
+test('the demo renders into the page', () => {
+  const dir = tmp(), yaml = join(dir, 'checkpoint.yaml');
+  copyFileSync(demo, yaml);
   const r = cli(yaml);
   assert.equal(r.status, 0, r.stderr);
   const out = r.stdout.trim();
@@ -230,16 +241,16 @@ test('the example renders into the page', () => {
 });
 
 test('there is no Markdown view', () => {
-  assert.equal(cli(example, '--md').status, 2);
+  assert.equal(cli(demo, '--md').status, 2);
 });
 
 test('a bad checkpoint fails with the line and field of each problem', () => {
   const dir = tmp(), yaml = join(dir, 'checkpoint.yaml');
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('state: blocked', 'state: stuck').replace('    stack: 2\n', '    stack: 3\n'));
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('state: blocked', 'state: stuck').replace('    stack: 2\n', '    stack: 3\n'));
   const r = cli(yaml);
   assert.equal(r.status, 1);
   assert.match(r.stderr, /checkpoint\.yaml:\d+: slices\[3\]\.state: expected one of: checkpoint, blocked, built, waiting; got "stuck"/);
-  writeFileSync(yaml, readFileSync(example, 'utf8').replace('    stack: 2\n', '    stack: 3\n').replace(/    question:[\s\S]*?- Keep both and flag the mismatch for review\n/, ''));
+  writeFileSync(yaml, readFileSync(demo, 'utf8').replace('    stack: 2\n', '    stack: 3\n').replace(/    question:[\s\S]*?- Keep both and flag the mismatch for review\n/, ''));
   const r2 = cli(yaml);
   assert.match(r2.stderr, /slices\[4\]\.stack: no stack has id "3"/);
   assert.match(r2.stderr, /slices\[3\]: a blocked slice needs its question/);
