@@ -1,0 +1,67 @@
+# checkpoint.yaml: copy the shape, not the content. Omit optional fields that don't apply.
+#   node <skill dir>/scripts/render.mjs checkpoint.yaml   → checkpoint.html (no --md view)
+# Multi-line text: a block scalar (|). Quote one-line values containing ": " or " #".
+# A slice matches the plan when Done, no decisions, built == planned, every flow proved.
+id: build-ISSUE-123-cp1  # unique per checkpoint
+title: Partial refunds  # what the run builds
+issue:
+  ref: ISSUE-123
+  url: "#"  # optional
+checkpoint:
+  stack: 1  # the stack this checkpoint follows
+stacks:
+  - id: 1
+    repo: api
+slices:  # in plan order
+  - n: 1  # the number answers refer to ("pass 1")
+    stack: 1
+    title: Partial refund endpoint
+    state: checkpoint  # checkpoint | blocked | built | waiting
+    status: Unproved  # optional, the worker's report: Done | Unproved | Failed | Blocked
+    pr:  # optional; required at checkpoint
+      num: 101
+      url: "#"
+    planned:  # the plan's shape, a line each
+      files: |  # optional
+        api/src/refunds/refund.service.ts  new
+      calls: |  # optional
+        POST /payments/:id/refunds
+          RefundService.refund
+    built:  # optional: the same, as built
+      files: |
+        api/src/refunds/refund.service.ts  new
+        api/src/refunds/idempotency.ts  new
+      calls: |
+        POST /payments/:id/refunds
+          idempotency.check
+          RefundService.refund
+    decisions:  # optional: decided beyond the plan; ids run-wide
+      - id: D1
+        text: A retried request returns the first refund  # plain words
+        why: The web client retries on timeout.
+        explains: [idempotency]  # optional: substrings of built lines it accounts for
+    flows:  # optional
+      - name: A refund over the remaining amount is rejected
+        state: broken  # proved | broken | unwalkable
+        headline: An over-limit refund is accepted  # broken only: what happens vs should
+        why: 60.00 on a 100.00 payment with 50.00 refunded went through.  # optional
+        expected: "422"  # broken only
+        actual: 201, refund created  # broken only
+        evidence:  # optional
+          label: failing request
+          url: "#"
+  - n: 2
+    stack: 1
+    title: Provider refund webhook
+    state: blocked
+    status: Blocked
+    planned:
+      files: |
+        api/src/webhooks/refund.handler.ts  new
+    question:  # blocked only
+      text: When amounts differ, does ours or the provider's win?  # plain words
+      why: Rounding can make them differ; the plan is silent.  # optional, one line
+      phase: implement  # optional: where the worker stopped
+      options:  # 2 or 3; first is recommended
+        - Ours wins; log the difference
+        - The provider's wins

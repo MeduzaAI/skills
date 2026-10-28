@@ -70,19 +70,50 @@ path rules that load for the files it touches.
 
 Rank by recurrence first (the same ask in different words counts as one
 theme, made N times), then by cost (redesign beats a rename). For each
-improvement: the evidence (quotes with links), the owner, and the concrete
-change.
+theme:
 
-Save the report where the workspace keeps retros, if it documents a place;
-otherwise `~/.agents/retros/<project-dir>/YYYY-MM-DD-<slug>.md`.
+- **headline**: the lesson in plain words, as what the agent does wrong.
+  Never the comment text.
+- the evidence: quotes with links, and the reply that answered each;
+- the owner: the kind of fix, the repo, and the file, skill or check;
+- the concrete change as a **diff to the owner file**: the rule, check or
+  skill text exactly as it would land.
+
+Write them once, as `retro.yaml` in the shape of
+`assets/retro.example.yaml`; its comments describe each field. Seed
+`targets` with the owners found in step 2 and the repos in play, so the
+user can reroute a fix without typing paths. The report is
+`node <this skill's dir>/scripts/render.mjs retro.yaml --md` (Node 18+),
+saved where the workspace keeps retros, if it documents a place; otherwise
+`~/.agents/retros/<project-dir>/YYYY-MM-DD-<slug>.md`, with `retro.yaml`
+beside it.
 
 ## 4. Apply what the user approves
 
-Present the ranked list and ask which to action. Then each in its owner:
-a repo change on its own branch with a draft PR in that repo (one repo, one
-PR; the same branch name when one change spans repos); a skill change via
-the skill-authoring skill when one is installed. Nothing is changed before
-the user picks it.
+Render `retro.yaml` with the same script, without `--md`, and open the
+HTML it prints; the script fills `assets/retro.html`, so don't read it.
+Without Node, write the same data as JSON, multi-line text as lists of
+lines, in place of that template's `/*DATA*/null/*/DATA*/` marker, and the
+report by hand. In chat, say only that the retro is open and to paste the
+answer block when done.
+
+The user marks each theme do or skip, edits its route or text, or
+comments, and pastes back the answer block. Apply it:
+
+- `do 1 3`: apply those changes as proposed.
+- `skip 2`: drop it; mark it `decided` skip, so the report says so.
+- `4 ✎`, with a `→ <kind> <target> @ <repo>` line and/or indented rule
+  text: apply the user's version, to their target, as written.
+- `5 💬 "…"`: don't apply. Rework that theme's proposal in `retro.yaml`
+  to meet the comment (a `✎` block for it is the starting point), then
+  render another round: new `id`, `round` + 1, `round` and `previous` set
+  on the reworked themes, `decided` on the themes settled so far. Repeat
+  until no theme is left to revise, then save the `--md` report again.
+
+Each change lands in its owner: a repo change on its own branch with a
+draft PR in that repo (one repo, one PR; the same branch name when one
+change spans repos); a skill change via the skill-authoring skill when one
+is installed. Nothing is changed before the user picks it.
 
 ## Report
 
@@ -97,3 +128,7 @@ went (PR link, skill, or left as a note).
   planning.
 - Putting standards in `AGENTS.md`/`CLAUDE.md` → the reviewer's standards file.
 - Fixing one instance of a recurring ask → the rule, so every instance goes.
+- The report pasted in chat, or a Markdown list, for approval →
+  `retro.html`; chat says only that it is open.
+- Reading or hand-editing `retro.html`, or writing the report apart from
+  the data → edit `retro.yaml`, render; `--md` is the report.

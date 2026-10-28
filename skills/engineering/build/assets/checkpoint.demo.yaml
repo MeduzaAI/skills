@@ -1,0 +1,174 @@
+# checkpoint.demo.yaml: a full sample, for previewing the page and for the tests.
+# Agents write from checkpoint.example.yaml, whose comments describe the fields.
+
+id: build-ISSUE-210-cp1        # unique per checkpoint; keys the page's saved answers
+title: Partial refunds         # what the run builds
+issue:                         # the issue or spec the plan came from
+  ref: ISSUE-210
+  url: "#"                     # optional
+checkpoint:
+  stack: 1                     # the stack this checkpoint follows
+stacks:
+  - id: 1
+    repo: api
+  - id: 2
+    repo: web
+
+slices:                        # in plan order
+  - n: 1                       # the number the user's answer refers to ("pass 1", "q4b")
+    stack: 1
+    title: Refund record and amount rules
+    state: checkpoint          # checkpoint (PR in front of the user) | blocked (worker returned a question) | built (passed earlier) | waiting
+    status: Done               # the worker's report: Done | Unproved | Failed | Blocked; leave out while waiting
+    pr:                        # leave out while there is no PR
+      num: 101
+      url: "#"
+    planned:                   # the plan's shape for the slice: files and calls, a line each
+      files: |
+        api/src/refunds/refund.model.ts  new
+        api/src/refunds/refund.rules.ts  new
+        api/migrations/0042_refunds.sql  new
+      calls: |
+        Refund.create(payment, amount)
+          rules.assertRefundable(payment, amount)
+    built:                     # the same, from the worker's show-me report; leave out when nothing was built
+      files: |
+        api/src/refunds/refund.model.ts  new
+        api/src/refunds/refund.rules.ts  new
+        api/migrations/0042_refunds.sql  new
+      calls: |
+        Refund.create(payment, amount)
+          rules.assertRefundable(payment, amount)
+    flows:
+      - name: A refund within the remaining amount is recorded
+        state: proved          # proved | broken | unwalkable
+        evidence:
+          label: test run
+          url: "#"
+      - name: Amount rules reject zero and negative refunds
+        state: proved
+        evidence:
+          label: test run
+          url: "#"
+
+  - n: 2
+    stack: 1
+    title: Partial refund endpoint
+    state: checkpoint
+    status: Unproved
+    pr:
+      num: 102
+      url: "#"
+    planned:
+      files: |
+        api/src/refunds/refund.controller.ts  new
+        api/src/refunds/refund.service.ts  new
+        api/src/refunds/refund.routes.ts  changed
+      calls: |
+        POST /payments/:id/refunds
+          RefundController.create
+            RefundService.refund
+              Refund.create
+              provider.refund
+    built:
+      files: |
+        api/src/refunds/refund.controller.ts  new
+        api/src/refunds/refund.service.ts  new
+        api/src/refunds/refund.routes.ts  changed
+        api/src/refunds/idempotency.ts  new
+      calls: |
+        POST /payments/:id/refunds
+          idempotency.check
+          RefundController.create
+            RefundService.refund
+              Refund.create
+              provider.refund
+    decisions:                 # decided beyond the plan; ids run-wide
+      - id: D1
+        text: A retried refund request returns the first refund instead of refunding twice   # plain words
+        why: The web client retries on timeout; the plan did not cover retries.
+        explains: [idempotency]   # substrings of the built-shape lines it accounts for
+    flows:
+      - name: Refund part of a captured payment
+        state: proved
+        evidence:
+          label: recording
+          url: "#"
+      - name: A refund over the remaining amount is rejected
+        state: broken
+        headline: A refund over the remaining amount is accepted; it should be rejected   # broken only: what happens vs what should
+        why: €60 on a €100 payment with €50 already refunded went through.               # broken only: one line
+        expected: '422 · "exceeds the remaining 50.00"'                                   # broken only
+        actual: 201 · refund of 60.00 created                                             # broken only
+        evidence:
+          label: failing request
+          url: "#"
+      - name: Refund a settled payment
+        state: unwalkable
+        evidence:
+          label: QA plan
+          url: "#"
+
+  - n: 3
+    stack: 1
+    title: List a payment's refunds
+    state: checkpoint
+    status: Done
+    pr:
+      num: 103
+      url: "#"
+    planned:
+      files: |
+        api/src/refunds/refund.routes.ts  changed
+        api/src/refunds/refund.query.ts  new
+      calls: |
+        GET /payments/:id/refunds
+          RefundQuery.forPayment
+    built:
+      files: |
+        api/src/refunds/refund.routes.ts  changed
+        api/src/refunds/refund.query.ts  new
+      calls: |
+        GET /payments/:id/refunds
+          RefundQuery.forPayment
+    flows:
+      - name: A payment's refunds are listed newest first
+        state: proved
+        evidence:
+          label: recording
+          url: "#"
+
+  - n: 4
+    stack: 1
+    title: Provider refund webhook
+    state: blocked
+    status: Blocked
+    planned:
+      files: |
+        api/src/webhooks/provider-refund.handler.ts  new
+      calls: |
+        POST /webhooks/provider
+          ProviderRefundHandler.handle
+            RefundService.settle
+    question:                  # blocked only
+      text: When the provider's refunded amount differs from ours, which one wins?   # plain words
+      why: >-                  # one line
+        Fees and currency rounding can make them differ; the plan does not say.
+        Stopped before writing code.
+      phase: implement         # where the worker stopped
+      options:                 # 2 or 3; the first is the recommended one
+        - Ours wins; log the difference
+        - The provider's wins; correct our record
+        - Keep both and flag the mismatch for review
+
+  - n: 5
+    stack: 2
+    title: Refund dialog on the payment page
+    state: waiting
+    planned:
+      files: |
+        web/src/payments/RefundDialog.vue  new
+      calls: |
+        PaymentPage
+          RefundDialog
+            api.createRefund
