@@ -57,6 +57,9 @@ themes:  # ranked: recurrence, then cost
     diff: |
       - id: no-float-money
         entry: 'float\('
+    evidence:
+      - quote: Use Decimal for amounts.
+        url: "#"
     decided:  # optional: settled in an earlier round; arrives folded
       round: 1  # optional
       outcome: do  # do | skip
