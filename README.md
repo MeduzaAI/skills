@@ -77,8 +77,8 @@ skills.
 
 ## The delivery chain
 
-You approve the plan, then check each stack of PRs against it before the
-next one is built.
+You approve the plan, then review each stack of PRs before the next one is
+built.
 
 ```
 build
@@ -103,7 +103,7 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 ### Engineering
 
 - [brainstorm](skills/engineering/brainstorm/SKILL.md): work a plan or idea through, every open decision put to you.
-- [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice with checkpoints.
+- [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice, reviewing each stack of PRs.
 - [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is tested.
 - [implement](skills/engineering/implement/SKILL.md): build a planned slice or a ticket into a reviewed, verified draft PR.
 - [verify](skills/engineering/verify/SKILL.md): prove a change works on its deployment, then guard it with tests.

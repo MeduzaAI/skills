@@ -1,110 +1,53 @@
 ---
 name: build
-description: Read before shipping an issue or a project end to end. Use when the user hands over existing work and wants it planned together, then built slice by slice into draft PRs with checkpoints to steer. Produces stacked draft PRs, reviewed and verified, and a plan true to what was built.
+description: Ship a feature end to end, from an issue, spec or project to reviewed draft PRs. Read when the user wants it planned with them, built slice by slice by workers, and reviewed stack by stack on GitHub. Produces stacked, verified draft PRs, a plan true to what was built, and a retro.
 disable-model-invocation: true
 metadata:
   inspired-by: "Dex Horthy and HumanLayer, https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"
 ---
 
-# Build
+Plan the work with the user, have workers build it slice by slice into draft PRs, and pause after each stack for the user's review on GitHub.
 
-Plan the work with the user, then build it slice by slice, stopping at
-checkpoints where the user checks the PRs against the plan and steers what
-comes next. This session plans and orchestrates; each slice is built in a
-fresh worker, so this context holds the run, not the diffs.
+This session holds the run, not the diffs. It never builds, reviews or fixes code, not even a one-line fix; every change goes through a worker.
 
-## Inputs
-
-- **Consumes**: an existing issue, or a spec or project, named in the
-  conversation. Missing → ask; never derive it from the branch.
-- **Produces**: a draft PR per slice in the plan's stacks, and the plan
-  kept true to what was built.
+**Consumes** an issue, spec or project named in the conversation; missing → ask, never derive it from the branch. **Produces** a draft PR per slice in the plan's stacks, the plan kept true to what was built, and a retro.
 
 ## 1. Plan
 
-Run `meduza:plan` on the target, here, with the user. Nothing is built
-before they approve it.
+`meduza:plan` on the target, here, with the user. Nothing is built before they approve it.
 
-Then file the slices **following the workspace's documented process**: one
-task per slice, with its blockers as tracker relations. A single slice → the
-issue itself is the task.
+File the slices per the workspace's documented process: one task per slice, its blockers as tracker relations. A single slice → the issue itself is the task.
 
-## 2. Run the slices
+## 2. Build
 
-Per slice, one fresh worker running `meduza:build-slice`, given pointers
-only: the plan, the slice, its task, the repo, its base (the default branch
-for the bottom of a stack, the slice below otherwise), and the PR of each
-blocker in another repo.
+Per slice, one fresh worker running `meduza:implement`, given pointers only, never pasted plan text: the plan, the slice, its task, the repo, the base (the default branch at the bottom of a stack, the slice below otherwise), and the PR of each blocker in another repo.
 
-A slice starts when:
+Within a stack, a slice starts when the one below it is built. Across stacks, it starts only once everything it depends on has passed the user's review. Independent stacks run in parallel.
 
-- within its stack, the slice below it is built;
-- across stacks, every slice it depends on has passed a checkpoint, so
-  nothing is built on code the user has not seen.
+## 3. Review
 
-Stacks with no dependency between them run in parallel.
+When a stack's workers have all reported, post one line per PR, its link and status (Done, Unproved, Blocked), then each Blocked question with its options. Nothing else: risks, decisions beyond the plan and evidence are in the PR bodies, where the user reviews.
 
-## 3. Checkpoint
+```
+S1 https://github.com/acme/app/pull/12 Done
+S2 https://github.com/acme/app/pull/13 Blocked
+S2: retry in the client or in the queue? (a) client, per D3 (b) queue, survives restarts
+```
 
-After each stack, and once after the first slice of the first stack, so
-the tracer bullet is checked before anything is built on it. From the
-workers' reports, write `checkpoint.yaml` next to the user's work in the
-shape of `assets/checkpoint.example.yaml`, whose comments describe the
-fields: per slice its PR and status, the planned shape beside the built
-one, what was decided beyond the plan, its flows, or the question it
-returned; a new `id` per checkpoint. Render it with
-`node <this skill's dir>/scripts/render.mjs checkpoint.yaml` (Node 18+) and
-open the HTML it prints; the script fills `assets/checkpoint.html`, so
-don't read it. Without Node, write the same data as JSON, multi-line text
-as lists of lines, in place of that template's `/*DATA*/null/*/DATA*/`
-marker. PRs that match the plan collapse into one item. In chat, say only
-that the checkpoint is open and to paste the answer line when done.
+Then hand off `/autofix-pr`, a Claude Code command only the user can run: one PR at a time, bottom to top, enter that PR's worktree and ask the user to run it or say skip. Elsewhere, ask the user to say when their comments are in, then rework that PR, telling the worker its comments are in.
 
-Then hand off `/autofix-pr` (a Claude Code command), one PR at a time,
-bottom to top: the session enters the PR's worktree, the user runs it or
-says skip. Only the user can invoke it; ask and wait. It picks up the
-comments the user leaves on the PR and pushes the fixes. Elsewhere, when
-the user says their comments are in, fetch them and treat them as rework.
+The user replies in plain words:
 
-The user checks the PRs, then pastes the answer line:
+- Approve or pass → the next stack. If any PR got pushes since the stack's report, a fresh subagent compares its shape with its slice; a changed shape, or a decision beyond the plan the user accepted → `meduza:plan` Revise before any slice that relies on it starts or continues.
+- Rework on a PR, or an answer to a Blocked question → a new implement worker with the feedback or answer verbatim, the PR and its worktree. When it reports, post that PR's line again.
+- Rejecting a decision beyond the plan → rework on its PR to undo it.
 
-- **`pass n`** → a fresh agent redraws the built shape of each PR that got
-  pushes since its report, beside the plan's; a difference → Revise. Then
-  the next stack. A PR passes only once each decision beyond the plan on it
-  is accepted; the document holds Pass back until then.
-- **`rework n: "…"`** → a new `build-slice` worker with their feedback
-  verbatim (the line, PR comments) and the worktree. Back to the checkpoint.
-- **`q4b`, or `q4: "…"`** → the answer to slice 4's question: that option,
-  or the user's text. A new worker continues with it.
-- **`accept D1`** → the code stays as built: `meduza:plan` Revise before
-  the next dependent slice starts. **`reject D1`** → rework of its PR to
-  undo it. A `shapeN` item, a shape difference no decision explains, takes
-  the same answers.
-
-A push to a lower PR once slices sit on it
-(rework, `/autofix-pr`) → restack them: `gh stack rebase`, then submit;
-without `gh stack`, rebase each branch onto the one below and force-push
-it.
+Within a stack, work bottom to top: after any push to a lower PR, restack the PRs above it before a worker touches them, `gh stack rebase` then submit; without `gh stack`, rebase each branch onto the one below and force-push it. A conflict is rework for that PR's worker.
 
 ## 4. Retro
 
-After the last checkpoint passes, run `meduza:retro` here, with the user,
-on this session, the PRs and the plan.
+After the last stack passes, `meduza:retro` here, with the user, on this session, the PRs and the plan.
 
 ## Report
 
-One table: slice, stack, repo, PR, status, checkpoint rounds. Then what is
-blocked and why, where the retro landed (its report and each applied
-change), and the next step: which stack to merge first.
-
-## Common mistakes
-
-- Building, reviewing or fixing in this session → a `build-slice` worker.
-- Pasting plan text into a worker → pointers.
-- Starting a slice in another stack before what it depends on passed a
-  checkpoint.
-- Building on after accepting a deviation without Revise.
-- The checkpoint written out in chat → `checkpoint.html`; chat says only
-  that it is open.
-- Reading or hand-editing `checkpoint.html` → write `checkpoint.yaml` and
-  render it.
+One table: slice, stack, repo, PR, status, review rounds. Then what is blocked and why, where the retro landed, and the next step: which stack to merge first.

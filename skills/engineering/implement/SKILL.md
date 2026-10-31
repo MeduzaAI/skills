@@ -1,6 +1,6 @@
 ---
 name: implement
-description: Build one slice of an approved plan, or a ticket small enough to need no plan, into a pull request. Read before writing the code, whether the user asks directly or `meduza:build` hands over a slice. Produces a reviewed, verified draft PR and a report for the user's checkpoint.
+description: Build one slice of an approved plan, or a ticket small enough to need no plan, into a pull request. Read before writing the code, whether the user asks directly or `meduza:build` hands over a slice. Produces a reviewed, verified draft PR and a report.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
@@ -45,7 +45,7 @@ Commit per the repo's conventions, push, and open a draft PR (`gh stack` when in
 
 - Status: Done; Unproved (PR open, verify could not prove it or bugs remain); or Blocked (the question, 2 to 3 options, the step it stopped in, and the rest of this list as far as it got).
 - PR, branch, worktree.
-- Built shape: the file-tree and call-tree diffs from `meduza:show-me`, for the checkpoint to set beside the plan's.
+- Built shape: the file-tree and call-tree diffs from `meduza:show-me`, for the caller to set beside the plan's.
 - Decided beyond the plan: Deviations and declined findings, "None" when none.
 - Per case: the test name and its red failure line.
 - Verify: flows proved, broken, not walkable, and bugs remaining.

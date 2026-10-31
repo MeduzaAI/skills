@@ -40,7 +40,7 @@ For each comment or correction, decide what should have prevented it:
 | A judgement rule (structure, error handling, test shape, "follow the sibling") | The repo's standards that its reviewer loads: its review checklist or path rules. `AGENTS.md`/`CLAUDE.md` holds only navigation pointers. |
 | A rule that exists but was not applied | Enforcement, not a new rule: wire it into the reviewer or a check, or make it discoverable from the paths it governs. |
 | A rule the repo documents the opposite way | Ask the user for the ruling, then fix the document. |
-| A product or technical decision made in review | The planning step that should have asked it: a missing class of question in the planning skill the session used, or a checkpoint that should have caught it. If the work is still running, add the answer to its plan's decisions. |
+| A product or technical decision made in review | The planning step that should have asked it: a missing class of question in the planning skill the session used, or a stack review that should have caught it. If the work is still running, add the answer to its plan's decisions. |
 | A PR boundary problem (too small, too big, wrong stack) | The slicing and stacking rules of the planning skill the session used. |
 | A skill behaving wrongly | The skill that did it, rebuilt in its own repo, through the skill-authoring skill when one is installed. |
 | Information the agent could not find or reach | A navigation pointer, a doc, or access (logs, read-only service access). |
