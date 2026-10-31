@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Write tests red-first for new or changed behaviour, unit or end-to-end, and judge whether existing tests actually prove what they claim. Read before writing any test, including when a plan or caller hands over seams and cases, and before reviewing test quality. It is the one standard for both writing and reviewing tests.
+description: Write tests red-first for new or changed behaviour, unit or end-to-end, and judge whether existing tests actually prove what they claim. Read before writing any test, including when the seams and cases are already given, and before reviewing test quality. It is the one standard for both writing and reviewing tests.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills; Kent Beck, https://testdesiderata.com; Simon Willison, https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/"
 ---
@@ -12,7 +12,7 @@ Reviewing tests instead of writing them → judge them against the same rules be
 
 ## Where to test
 
-Seams and cases given by the plan or caller → test exactly those cases, through exactly those seams. Items marked not tested stay untested.
+Seams and cases given in the conversation (a plan, a ticket, the user) → test exactly those cases, through exactly those seams. Items marked not tested stay untested.
 
 None given → choose the public interfaces and the cases yourself and list them before the first test. Ambiguous and a user is present → propose them in a few lines and wait.
 
@@ -23,7 +23,7 @@ Spend tests by kind of code:
 - Business logic and domain rules → unit tests, many cases, edges included.
 - Orchestration and wiring → a few integration tests: the main path and the failures that matter.
 - Trivial code, type-guaranteed behaviour, framework or library behaviour → no test.
-- Logic tangled with I/O → separate the logic first; if that is outside the slice, say so instead of testing through the tangle.
+- Logic tangled with I/O → separate the logic first; if that is outside the task, say so instead of testing through the tangle.
 
 ## The loop
 

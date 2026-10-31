@@ -1,35 +1,35 @@
 ---
 name: code-review
-description: Read before reviewing a branch, PR, or issue's changes against the repo's conventions and the spec they came from. Use when the user or a parent skill wants to know whether a change follows the standards, builds what was asked and tests it honestly. Produces Standards, Spec and repo-review findings, each hard or a judgement call, not a bug hunt.
+description: Read before reviewing a branch, PR, or issue's changes against the repo's conventions and the spec they came from. Use when someone wants to know whether a change follows the standards, builds what was asked and tests it honestly. Produces Standards, Spec and repo-review findings, each hard or a judgement call, not a bug hunt.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
 Review one repo's diff along three axes, each in its own parallel fresh subagent, and report them separately, never reranked across axes. A change can follow every standard and build the wrong thing, or build the right thing with tests that would stay green if it broke; one axis must not mask another.
 
-Not a bug hunt: `meduza:verify` proves the feature works and finds bugs.
+Not a bug hunt: it reads the change and never runs it.
 
-**Consumes** a target from the conversation or caller: a PR, an issue, or a branch with its worktree; none → the current branch, named in the report's first line. **Produces** the per-axis report in the conversation; posting it anywhere is the user's separate step.
+**Consumes** a target from the conversation: a PR, an issue, or a branch with its worktree; none → the current branch, named in the report's first line. **Produces** the per-axis report in the conversation; posting it anywhere is the user's separate step.
 
-Called by `meduza:implement` after building: the caller fixes findings with its own judgement, so every finding must be actionable on its own.
+Whoever fixes the findings reads only the report, so every finding must be actionable on its own.
 
 ## 1. Resolve the diff
 
-One repo per run: the PR's repo, else the one you are in. An issue resolves to the branch or open PR carrying it; several → ask. Base: the caller's, else the PR's, else the default branch.
+One repo per run: the PR's repo, else the one you are in. An issue resolves to the branch or open PR carrying it; several → ask. Base: the one named, else the PR's, else the default branch.
 
 Done when both refs resolve, you have the diff against the merge-base and the commit list, and the diff is non-empty. Fail here on a bad ref or an empty diff, before spawning anything.
 
 ## 2. Gather what the axes need
 
-**Spec.** Use the task and plan the caller named. Otherwise find the issue from the PR or commit messages (a branch name alone → confirm with the user) and fetch it through the workspace's documented tracker workflow. When sources disagree: a spec document linked from the issue, then its plan (whose decisions are binding), then the issue and its comments, then the PR body, then spec or plan files they reference. Nothing found → ask; the user says there is none → skip Spec and report "no spec available".
+**Spec.** Use the task and plan named in the conversation. Otherwise find the issue from the PR or commit messages (a branch name alone → confirm with the user) and fetch it through the workspace's documented tracker workflow. When sources disagree: a spec document linked from the issue, then its plan (whose decisions are binding), then the issue and its comments, then the PR body, then spec or plan files they reference. Nothing found → ask; the user says there is none, or nobody can answer (you run as a subagent) → skip Spec and report "no spec available". Running as a subagent, a branch name alone is not confirmation: skip Spec the same way.
 
-Caller names one slice → review that slice only; other slices' requirements and cases are not missing from this diff.
+Asked to review one slice → that slice only; other slices' requirements and cases are not missing from this diff.
 
 **Standards.** The repo's `AGENTS.md`/`CLAUDE.md`, path rules whose paths match a file in the diff, review checklists kept as docs, the workspace's shared style guide for this stack, and cross-repo invariants in the workspace root `AGENTS.md`/`CLAUDE.md`. For test quality: `meduza:tdd` (its `SKILL.md`, `references/tests.md` and `references/mocking.md`, in the `tdd` folder beside this skill) and the repo's testing docs.
 
 **Repo review.** The repo's own review skill, whatever it is called, among the skills it ships (`.agents/skills/` or `.claude/skills/`) and plugins the workspace documents for it. None → skip the axis and say so.
 
-The caller may name which axes to run; run only those.
+Asked for specific axes → run only those.
 
 ## 3. Spawn the axes in parallel
 
@@ -40,7 +40,7 @@ Every prompt gets the diff command, the commit list, and this output rule: "Each
 - Documented-standard breaches: cite file and rule; these can be hard. Skip what tooling enforces.
 - Smells from the baseline: always judgement, and a documented standard overrides them.
 - Test quality judged by `meduza:tdd`: for each bad test, quote the assertion and name the break it would miss.
-- Hard: a deleted, skipped or weakened test not listed as a deviation with a reason; a new test asserting no value (only existence, a boolean, a mock call or a snapshot); a test for code the repo says not to test.
+- Hard: a deleted, skipped or weakened test not explained in the PR body or commits; a new test asserting no value (only existence, a boolean, a mock call or a snapshot); a test for code the repo says not to test.
 - Tests of trivial code, type-guaranteed behaviour or impossible cases: judgement, remove them.
 - If the repo documents a mutation-testing command for changed files, run it and report surviving mutants as judgement.
 

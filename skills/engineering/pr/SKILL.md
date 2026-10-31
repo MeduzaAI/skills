@@ -1,11 +1,13 @@
 ---
 name: pr
-description: Write or update a pull request's description so a reviewer can judge in a few minutes whether it is safe to merge. Read before opening a PR, or when a skill needs to fill in part of a PR body, such as its verification evidence.
+description: Write or update a pull request's description so a reviewer can judge in a few minutes whether it is safe to merge. Read before opening a PR, or when one part of a PR body needs filling in, such as its verification evidence.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
 
-Write a PR body the reviewer skims in two minutes to judge merge risk. Review, tests and `meduza:verify` already cover style, standards and test quality; the body says what changed and where a wrong call would hurt.
+Write a PR body the reviewer skims in two minutes to judge merge risk. It says what changed and where a wrong call would hurt; style and standards belong to review, not the body.
+
+Default to the current branch against the repo's default branch: no PR yet → open it as a draft; one exists → edit its body.
 
 **The repo's template wins.** Find it (`.github/pull_request_template.md`, `.github/PULL_REQUEST_TEMPLATE/`, or the PR conventions in `AGENTS.md`/`CLAUDE.md`). Put each piece of content below into the slot that matches it and add the rest after the template; each fact appears once. Tick a checklist item only when you know it is true, and leave the rest unticked with a few words why. No template → use the pieces below as the body.
 
@@ -13,13 +15,13 @@ Write a PR body the reviewer skims in two minutes to judge merge risk. Review, t
 
 - **What and why**: one or two sentences, linking the plan's slice or the ticket.
 - **Shape**: `meduza:show-me` on the branch diff against its base; embed the single smallest view it returns.
-- **Where to look**: one to three places where a wrong call would hurt (data and migrations, auth, money, public contracts, irreversible actions), each as `file:line` and the question the reviewer should ask. Then one line each for decisions made beyond the plan and review findings the author declined, "None" when none. Nothing risky → say so with the reason.
+- **Where to look**: one to three places where a wrong call would hurt (data and migrations, auth, money, public contracts, irreversible actions), each as `file:line` and the question the reviewer should ask. Then, when there was a plan or a review, one line each for decisions made beyond it and findings the author declined. Nothing risky → say so with the reason.
 - **Tests**: each planned case → the test that covers it, one line each.
-- **Verification**: owned by `meduza:verify`: one visible status line (where it ran, flows proved out of total, bugs found), and the flow table, evidence links and human QA steps collapsed. Before verify has run → "Pending verify".
+- **Verification**: one visible status line (where it ran, flows proved out of total, bugs found), and the flow table, evidence links and human QA steps collapsed. Not verified yet → "Not verified yet".
 
 **Small.** The visible body fits on one screen. Tests and verification detail go in `<details>` blocks, unless the template's slot rules them out.
 
-**Updating.** Rewrite only the sections your change affects and keep everything else, including the user's edits. Called by `meduza:verify` → replace the Verification section only.
+**Updating.** Rewrite only the sections your change affects and keep everything else, including the user's edits. Asked to fill one section, such as the verification evidence → replace that section only.
 
 Example: a checklist-only template, filled.
 

@@ -1,6 +1,6 @@
 ---
 name: retro
-description: Read before reflecting on how a piece of agent-built work went, from its review comments or its sessions. Use when the user, or a skill finishing a run, wants the same review comment or correction never to be needed again. Produces ranked improvements, each routed to the check, standard or skill that owns it.
+description: Read before reflecting on how a piece of agent-built work went, from its review comments or its sessions. Use when someone wants the same review comment or correction never to be needed again. Produces ranked improvements, each routed to the check, standard or skill that owns it.
 metadata:
   inspired-by: "Matt Pocock, https://github.com/mattpocock/skills"
 ---
