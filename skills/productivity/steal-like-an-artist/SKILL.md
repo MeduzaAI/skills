@@ -35,8 +35,8 @@ Arrive at the interview with a numbered critique; it is the agenda. Cover:
 - **Load-bearing parts**: what makes the skill work. The brief must carry these.
 - **Structure**: trigger (frontmatter), body shape, `references/`, `scripts/`,
   length.
-- **Gaps against `meduza:skillify`'s `references/authoring-guide.md`**:
-  anything its checklist would flag.
+- **Gaps against `meduza:skillify`'s "Writing a skill" rules**: anything
+  they would cut or change.
 - **Assumptions that won't hold here**: paths, tools, repo layout, team
   conventions, output locations.
 
