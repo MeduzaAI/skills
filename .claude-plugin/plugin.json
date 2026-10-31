@@ -12,7 +12,6 @@
   "skills": [
     "./skills/engineering/brainstorm",
     "./skills/engineering/build",
-    "./skills/engineering/build-slice",
     "./skills/engineering/code-review",
     "./skills/engineering/implement",
     "./skills/engineering/plan",
