@@ -1,6 +1,6 @@
 {
   "name": "meduza",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Meduza's agent skills for shipping software: brainstorm, plan, build, review, verify and retro, plus skill authoring.",
   "author": {
     "name": "Meduza AI",
