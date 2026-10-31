@@ -1,55 +1,51 @@
 ---
 name: skillify
-description: Required reading before writing or editing any SKILL.md. Use when a workflow or hard-won approach from this session is worth keeping as a reusable skill. Produces one skill covering the capability, new or rebuilt, in the right plugin.
+description: Write or rebuild an agent skill. Required reading before creating or editing any SKILL.md, including turning a workflow from this session into one.
+metadata:
+  inspired-by: "Matt Pocock, https://github.com/mattpocock/skills; Anthropic, https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices; Jesse Vincent, https://github.com/obra/superpowers"
 ---
 
-# Skillify
+Turn a workflow into a skill, or rebuild an existing one. Done means exactly one skill covers the capability, and it is short enough that every line gets followed.
 
-Capture → dedupe → place → author. Afterwards exactly one skill must cover
-this capability. Create a todo per step.
+**Capture.** Pull the reusable approach out of the session: the technique, the order that mattered, the user's corrections, the input and output. Leave out the one-off story. State it in one line and confirm it with the user.
 
-## 1. Capture
+**Dedupe.** Search every skill you can see, installed and in the target repo.
 
-Extract the general, reusable approach from the session: technique, step
-order, the user's corrections, input/output shape. Not the one-off story.
-State it in one line and confirm with the user.
+- One already covers it → rebuild that one around the new case.
+- One overlaps → fold it in, or carve a clean boundary. Say which.
+- Unsure → list the candidates and let the user pick.
 
-## 2. Dedupe (DRY / MECE)
+**Place.** Where the user said wins. Inside a skills repo → follow its `AGENTS.md`/`CLAUDE.md` for the folder, manifest, README, changeset and PR. Inside another project → `.agents/skills/<name>/`, or `.claude/skills/` if the project already uses it. Tied to no project → ask. State the path before writing.
 
-Search every skill visible to you (user, project, installed plugins) for one
-that covers this or an adjacent slice.
+**Write** by the rules below. Rebuilding: re-read the whole skill and rewrite it with the new case folded into the core. Appended fixes blur the rule into its exceptions.
 
-- Covers it → rebuild that skill with the new case folded into its core, per
-  "Rebuild, don't patch" in the authoring guide. Say which and why.
-- Overlaps part of it → fix the boundary first: fold in, or carve a
-  non-overlapping slice. Say which.
-- Nothing → create.
-- Unsure → list the candidates and let the user choose.
+**Check.** Give a fresh subagent a realistic task without the skill, then with it, and compare. Rebuilding: include a case the old version missed.
 
-## 3. Place
+A missed instruction is a prominence problem: move it up or make it stronger, never add a neighbour. Then cut every sentence the run didn't need, and confirm the description still routes to what the body does.
 
-A scope the user named wins. Otherwise infer, state the reason, and confirm
-before writing anywhere but the default clone: a company project whose org
-is in the device config → `org [team]` (backend, frontend, QA by the
-project's stack); anything else → the default clone.
+Report: created or rebuilt, which skill, its path, what the check showed, and what is still owed (a PR, a release).
 
-| scope | path |
-|---|---|
-| clone (default) | a skills repo clone from the device config, `skills/<bucket>/<name>/` |
-| `project` | `<repo>/.agents/skills/<name>/`, or `.claude/skills/` if the repo already uses it |
-| `local` | same as project; remind the user it is gitignored |
-| `org [team]` | resolved from the device config's `orgs` |
+## Writing a skill
 
-Read `references/placement.md` for the device config, clone and `org`
-resolution.
+The reader is a capable agent that already knows how to code, search and use git. Write only what it can't look up or wouldn't do by default.
 
-## 4. Author and propagate
+- **Every sentence changes behaviour.** Would the agent act differently without it? No → delete the whole sentence. Every line of a short skill gets followed; a long one gets skimmed.
+- **No template.** No title heading: open with the instruction. Add headings only where the skill splits into distinct cases. A mistakes line earns its place only for a failure you have seen that the steps don't already prevent.
+- **Short paragraphs.** One or two sentences, one line per paragraph, no hard wrapping. Bullets for parallel items.
+- **Show, then tell.** One concrete example beats a paragraph of explanation, and beats five weak examples.
+- **Say what to do.** "Write one-line comments" beats "don't write long comments", because a prohibition puts the unwanted behaviour in mind. Keep "never" for hard guardrails, with the reason.
+- **Goal over steps.** Be exact about what done looks like and how to check it, the constraints, and facts the agent can't find. Leave out commands it knows, ordinary error handling, and runtime specifics such as paths, counts and versions.
+- **Leading words.** One word the model already understands (a _frontier_, a _tight_ loop) replaces a sentence. Reuse the word instead of re-explaining it.
+- **Link, don't copy.** Content owned elsewhere (a process doc, an API, a CLI's flags) gets a pointer, and the source wins. A copy goes stale and the agent trusts it anyway.
+- **Inputs come from the conversation.** No arguments or flags. Key modes to something the agent can observe ("dispatched by another skill → return instead of asking"). A phase of a longer workflow names the artifact it consumes and produces, so the next phase can start in a fresh session.
+- **Push down only what some runs need.** What every run needs stays in `SKILL.md`. Reference only some branches reach goes in `references/`, behind a pointer that says when to read it. Repeatable code goes in `scripts/`.
 
-Read `references/authoring-guide.md`, then write or edit the skill at the
-resolved path.
+**Description.** It sits in every session next to every other skill's description and decides whether this one loads. Lead with the situation or intent, in a sentence or three of its own shape. Describe the intent in plain words: the agent matches meaning, and quoted trigger phrases teach it to match words. Leave the steps out, because an agent that reads a workflow in the description follows that and skips the body.
 
-Propagate per `placement.md`: clone → changeset, commit and push, the user
-told when it ships and how to update. `org` → the plugin validates, note it needs a PR.
+```yaml
+description: Fix an end-to-end test that passes locally but fails in CI. Read before reaching for retries or longer timeouts.
+```
 
-Report: created or updated (which skill), absolute path, resolved
-scope/team/org, and the propagation step still owed.
+**Frontmatter.** `name` in hyphen-case, named for what the skill does or makes. `description`. `metadata.inspired-by: "<who>, <link>"` when it is built from someone's work. `disable-model-invocation: true` when only the user should start it, which also means no other skill can call it.
+
+**Every harness.** Describe the action ("ask with a question tool", "a fresh subagent"), not one harness's tool name, and write `AGENTS.md`/`CLAUDE.md` together. A skill in a public or personal repo reaches company facts by role ("the workspace's documented process"), never by naming teams, repos or trackers.

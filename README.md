@@ -125,6 +125,8 @@ Many of these skills started from other people's work:
 - [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `research` and `retro` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
 - [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill, and `plan` and `build` follow [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md).
 
+- [Anthropic's skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), Matt's writing-for-agents and [Jesse Vincent's superpowers](https://github.com/obra/superpowers): `skillify`'s writing rules are drawn from all three.
+
 Each of those skills names its source in `metadata.inspired-by` in its frontmatter.
 
 ## Contributing
