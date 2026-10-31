@@ -1,5 +1,17 @@
 # meduza
 
+## 2.2.0
+
+### Minor Changes
+
+- [#9](https://github.com/MeduzaAI/skills/pull/9) [`dce35cb`](https://github.com/MeduzaAI/skills/commit/dce35cbea282f1c5044a2234db1a837368752bf5) Thanks [@mattaliev](https://github.com/mattaliev)! - `build`: each checkpoint is written as `checkpoint.yaml` and rendered by `scripts/render.mjs` into an HTML document (`assets/checkpoint.html`), one item at a time, where the user passes or reworks each PR, answers workers' questions and accepts or rejects decisions beyond the plan, then pastes back one answer line.
+
+- [#9](https://github.com/MeduzaAI/skills/pull/9) [`dce35cb`](https://github.com/MeduzaAI/skills/commit/dce35cbea282f1c5044a2234db1a837368752bf5) Thanks [@mattaliev](https://github.com/mattaliev)! - `plan`: the plan is written once as `plan.yaml` and rendered by `scripts/render.mjs` into an HTML document (`assets/plan.html`), and with `--md` into the saved plan; the document shows the decisions settled beforehand locked; the user comments on or edits any block, marks pieces ok, and pastes back one answer block with `approve` or `changes`.
+
+- [#9](https://github.com/MeduzaAI/skills/pull/9) [`dce35cb`](https://github.com/MeduzaAI/skills/commit/dce35cbea282f1c5044a2234db1a837368752bf5) Thanks [@mattaliev](https://github.com/mattaliev)! - `retro`: improvements are written once as `retro.yaml` and rendered by `scripts/render.mjs` into an HTML document (`assets/retro.html`), and with `--md` into the saved report; each theme as a plain-words lesson beside a diff to the file that owns the fix; the user does, skips, reroutes or edits each one, or comments for a reworked proposal in another round, and pastes back one answer block.
+
+- [#11](https://github.com/MeduzaAI/skills/pull/11) [`bc7a5a1`](https://github.com/MeduzaAI/skills/commit/bc7a5a19bd05469647ee2b06ea08de68ede54805) Thanks [@mattaliev](https://github.com/mattaliev)! - `skillify` is rebuilt: one short `SKILL.md` with its writing rules inline (no body template, no title heading, every sentence must change behaviour, free-form descriptions without quoted trigger phrases), a check step that runs a fresh subagent with and without the skill, and placement read from the target repo's `AGENTS.md`/`CLAUDE.md`. The authoring guide, the placement reference and the `~/.agents/skillify.json` device config are gone.
+
 ## 2.1.1
 
 ### Patch Changes
