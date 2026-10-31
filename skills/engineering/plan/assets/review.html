@@ -1,0 +1,54 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Review</title>
+<style>
+body{max-width:46rem;margin:2rem auto 8rem;padding:0 1rem;font:16px/1.6 system-ui,sans-serif;color:#222}
+h1,h2,h3,h4{line-height:1.25;margin:1.6em 0 .5em}h2{border-bottom:1px solid #eee;padding-bottom:.2em}
+code{font:.9em ui-monospace,monospace;background:#f4f4f4;padding:.1em .3em;border-radius:3px}
+pre{background:#f6f6f6;padding:.8em;border-radius:6px;overflow:auto}pre code{background:none;padding:0}pre.mermaid{background:none;text-align:center}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #ddd;padding:.35em .6em;text-align:left;vertical-align:top}
+blockquote{margin:0;padding-left:1em;border-left:3px solid #ddd;color:#555}
+.c{font:12px system-ui;margin-left:.5em;padding:0 .4em;border:1px solid #ccc;border-radius:3px;background:#fff;color:#555;cursor:pointer;vertical-align:middle}
+textarea{display:block;width:100%;box-sizing:border-box;font:14px system-ui;margin:.3em 0;padding:.4em}
+#bar{position:fixed;bottom:0;left:0;right:0;background:#fafafa;border-top:1px solid #ddd;padding:.6em 1rem}#bar>*{max-width:46rem;margin:auto}
+#bar button{font:inherit;padding:.3em 1em}
+</style>
+<script type="module">
+import { marked } from 'https://cdn.jsdelivr.net/npm/marked@15/lib/marked.esm.js';
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+const src = document.getElementById('src'), main = document.querySelector('main');
+main.innerHTML = marked.parse(src.textContent);
+src.remove();
+document.title = main.querySelector('h1')?.textContent || document.title;
+for (const c of main.querySelectorAll('code.language-mermaid')) {
+  const p = document.createElement('pre'); p.className = 'mermaid'; p.textContent = c.textContent; c.parentNode.replaceWith(p);
+}
+mermaid.initialize({ startOnLoad: false }); mermaid.run();
+// Each heading and table row is a block. Its id is a leading token like "S1" or "D3", else its text under the nearest such heading.
+const boxes = [], ctx = [], tok = s => s.match(/^([A-Z]{1,3}\d+(\.\d+)?)\b/)?.[1];
+for (const el of main.querySelectorAll('h2,h3,h4,tbody tr')) {
+  const text = el.textContent.trim(), row = el.tagName === 'TR', lvl = row ? 9 : +el.tagName[1];
+  const up = ctx.slice(0, lvl).filter(Boolean).pop(), own = tok(text);
+  const id = own || (up ? up + ' ' : '') + (row ? el.firstElementChild.textContent : text).trim().slice(0, 40);
+  if (!row) { ctx.length = lvl; ctx[lvl] = own; }
+  const t = document.createElement('textarea'); t.dataset.id = id; t.rows = 2; t.hidden = true; t.placeholder = id + ': comment'; boxes.push(t);
+  const b = document.createElement('button'); b.className = 'c'; b.textContent = own || '+'; b.title = 'Comment on ' + id;
+  b.onclick = () => { t.hidden = !t.hidden; if (!t.hidden) t.focus(); };
+  if (row) el.lastElementChild.append(b, t); else el.append(b), el.after(t);
+}
+const all = document.getElementById('all'), out = document.getElementById('out');
+document.getElementById('copy').onclick = async () => {
+  const lines = boxes.filter(t => t.value.trim()).map(t => t.dataset.id + ': ' + t.value.trim().replace(/\s*\n\s*/g, ' '));
+  if (all.value.trim()) lines.push('All: ' + all.value.trim().replace(/\s*\n\s*/g, ' '));
+  out.value = lines.length ? lines.join('\n') : 'approve'; out.hidden = false; out.select();
+  try { await navigator.clipboard.writeText(out.value); } catch {}
+};
+</script>
+<main></main>
+<div id="bar"><div>
+<textarea id="all" rows="1" placeholder="Overall comment (leave every box empty to approve)"></textarea>
+<button id="copy">Copy feedback</button> paste it into the chat
+<textarea id="out" rows="3" hidden readonly></textarea>
+</div></div>
+<plaintext id="src" hidden>

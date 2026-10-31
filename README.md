@@ -102,10 +102,12 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 
 - [brainstorm](skills/engineering/brainstorm/SKILL.md): work a plan or idea through, every open decision put to you.
 - [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice with checkpoints.
-- [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is checked.
+- [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is tested.
 - [build-slice](skills/engineering/build-slice/SKILL.md): implement, review and verify one planned slice into a draft PR.
 - [implement](skills/engineering/implement/SKILL.md): build one planned slice into a verified commit.
 - [verify](skills/engineering/verify/SKILL.md): prove a change works on its deployment, then guard it with tests.
+- [tdd](skills/engineering/tdd/SKILL.md): write tests red-first through the given seams and cases; the standard tests are reviewed against.
+- [pr](skills/engineering/pr/SKILL.md): write a short PR body, merged with the repo's template, that shows where a wrong call would hurt.
 - [code-review](skills/engineering/code-review/SKILL.md): review a change against the repo's standards and its spec.
 - [research](skills/engineering/research/SKILL.md): investigate a question against primary sources.
 - [show-me](skills/engineering/show-me/SKILL.md): explain code flow or a change with visuals.
@@ -122,8 +124,9 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 
 Many of these skills started from other people's work:
 
-- [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `research` and `retro` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
+- [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `pr`, `research`, `retro` and `tdd` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
 - [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill, and `plan` and `build` follow [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md).
+- [Kent Beck](https://testdesiderata.com) and [Simon Willison](https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/): `tdd` follows Test Desiderata and red/green TDD for agents.
 
 - [Anthropic's skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), Matt's writing-for-agents and [Jesse Vincent's superpowers](https://github.com/obra/superpowers): `skillify`'s writing rules are drawn from all three.
 

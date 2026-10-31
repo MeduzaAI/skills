@@ -7,10 +7,7 @@ metadata:
 
 # Retro
 
-Every review comment and every correction the user had to make is a defect
-in the agent's environment, not just in the code. This skill finds them,
-works out which part of the environment should have prevented each one, and
-proposes the fix there, so the next run does not need the comment.
+Every review comment and every correction the user had to make is a defect in the agent's environment, not just in the code. This skill finds them, works out which part of the environment should have prevented each one, and proposes the fix there, so the next run does not need the comment.
 
 Be specific and critical. A flattering retro is worthless.
 
