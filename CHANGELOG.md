@@ -1,5 +1,29 @@
 # meduza
 
+## 3.0.0
+
+### Major Changes
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - `implement` is rebuilt and absorbs `build-slice`, which is removed. It takes a planned slice or a ticket to a draft PR in the session it runs in: `tdd` at the slice's seams, cases and flows, the repo's checks, `code-review` in a fresh subagent with this agent fixing what it agrees with, a PR body by `pr`, and `verify` in a fresh subagent whose bugs come back to it. It runs the same whether the user or `build` starts it.
+
+### Minor Changes
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - `build` is slimmed to orchestration: plan with the user, one `implement` worker per slice, a review per stack, then retro. The checkpoint document, its renderer and the answer grammar are gone: when a stack finishes, chat shows one line per PR and any blocked questions, the user reviews on GitHub (with `/autofix-pr` in Claude Code) and replies in plain words.
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - `code-review` has three axes: Standards (now also judging test quality against `tdd`), Spec (now also requiring a test for every planned case and flow) and the repo's own review skill. The separate Tests axis is gone, the smell baseline moves to `references/smells.md`, and each finding is one line marked hard or judgement with its `file:line`.
+
+- [#9](https://github.com/MeduzaAI/skills/pull/9) [`dce35cb`](https://github.com/MeduzaAI/skills/commit/dce35cbea282f1c5044a2234db1a837368752bf5) Thanks [@mattaliev](https://github.com/mattaliev)! - `plan` is freeform: the agent writes `plan.md` sized to the change, which is the saved plan workers read, and reviews it as an HTML page made by prepending a small generic shell (`assets/review.html`) that renders the Markdown and Mermaid and adds a comment box per heading and table row; the user pastes back the copied feedback lines or `approve`. Each slice now lists its `Seams`, `Cases`, `Not tested` and `Flows`. The YAML schema, renderer and template are gone.
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - New `pr` skill: a short PR body merged into the repo's own template, with the shape of the change from `show-me`, the one to three places where a wrong call would hurt, planned cases mapped to tests, and a verification slot `verify` fills.
+
+- [#9](https://github.com/MeduzaAI/skills/pull/9) [`dce35cb`](https://github.com/MeduzaAI/skills/commit/dce35cbea282f1c5044a2234db1a837368752bf5) Thanks [@mattaliev](https://github.com/mattaliev)! - `retro` writes its report once as `retro.md`, each theme a `T<n>` heading with its lesson, evidence, owner and the change as a diff, and reviews it as an HTML page built by prepending the same small review shell `plan` uses; the user pastes back feedback lines (`T1: do`, `T2: skip`, a reroute or a comment) or `approve`. The YAML schema, renderer and template are gone.
+
+- [#11](https://github.com/MeduzaAI/skills/pull/11) [`bc7a5a1`](https://github.com/MeduzaAI/skills/commit/bc7a5a19bd05469647ee2b06ea08de68ede54805) Thanks [@mattaliev](https://github.com/mattaliev)! - `skillify` is rebuilt: one short `SKILL.md` with its writing rules inline (no body template, no title heading, every sentence must change behaviour, free-form descriptions without quoted trigger phrases), a check step that runs a fresh subagent with and without the skill, and placement read from the target repo's `AGENTS.md`/`CLAUDE.md`. The authoring guide, the placement reference and the `~/.agents/skillify.json` device config are gone.
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - New `tdd` skill: write tests red-first, one case at a time, through the given seams and cases, with independent oracles and mocks only at system boundaries. It is the one standard for writing tests and for reviewing them.
+
+- [#12](https://github.com/MeduzaAI/skills/pull/12) [`829bb23`](https://github.com/MeduzaAI/skills/commit/829bb23d8467d8083717a5fecba82cb284bf58ac) Thanks [@mattaliev](https://github.com/mattaliev)! - `verify` proves a change works and has no bugs on a running system: it walks every flow, reads the diff for likely bugs and reproduces each on the app, counting only what it shows happening with evidence. It writes no code; bugs go back to `implement`. With nothing runnable it falls back to a static bug review labelled "not run". It fills the PR's Verification section through `pr`.
+
 ## 2.1.1
 
 ### Patch Changes
