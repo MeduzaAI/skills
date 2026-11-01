@@ -38,9 +38,11 @@ Then hand off `/autofix-pr`, a Claude Code command only the user can run: one PR
 
 The user replies in plain words:
 
-- Approve or pass → the next stack. If any PR got pushes since the stack's report, a fresh subagent compares its shape with its slice; a changed shape, or a decision beyond the plan the user accepted → `meduza:plan` Revise before any slice that relies on it starts or continues.
+- Approve or pass → the next stack. A decision beyond the plan the user accepted → `meduza:plan` Revise first.
 - Rework on a PR, or an answer to a Blocked question → a new implement worker with the slice's full brief as in step 2, the feedback or answer verbatim, the branch and worktree, and the PR if one exists. When it reports, post that PR's line again.
 - Rejecting a decision beyond the plan → rework on its PR to undo it.
+
+After any push to a PR once the stack has reported (rework, `/autofix-pr`), a fresh subagent compares its shape with its slice; changed → `meduza:plan` Revise before any worker touches a slice that relies on it.
 
 Within a stack, work bottom to top: after any push to a lower PR, restack the PRs above it before a worker touches them, `gh stack rebase` then submit; without `gh stack`, rebase each branch onto the one below and force-push it. A conflict is rework for that PR's worker.
 
