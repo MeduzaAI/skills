@@ -77,17 +77,19 @@ skills.
 
 ## The delivery chain
 
-You approve the plan, then check each stack of PRs against it before the
-next one is built.
+You approve the plan, then review each stack of PRs before the next one is
+built.
 
 ```
 build
-├─ plan                      with you: architecture, slices, program design
-├─ per slice: build-slice    a fresh worker
-│  ├─ implement
+├─ plan                      with you: decisions, slices and their tests
+├─ per slice: implement      a fresh worker
+│  ├─ tdd
 │  ├─ code-review
-│  └─ verify                 → draft PR, then your checkpoint
-└─ retro                     with you, after the last checkpoint
+│  ├─ pr                     → draft PR
+│  └─ verify                 → proved working, or bugs back to implement
+├─ after each stack          you review the PRs
+└─ retro                     with you, after the last stack
 ```
 
 Each skill calls only the ones below it. `brainstorm` comes before, while
@@ -101,12 +103,13 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 ### Engineering
 
 - [brainstorm](skills/engineering/brainstorm/SKILL.md): work a plan or idea through, every open decision put to you.
-- [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice with checkpoints.
-- [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is checked.
-- [build-slice](skills/engineering/build-slice/SKILL.md): implement, review and verify one planned slice into a draft PR.
-- [implement](skills/engineering/implement/SKILL.md): build one planned slice into a verified commit.
+- [build](skills/engineering/build/SKILL.md) (user-invoked): plan an issue or project with you, then build it slice by slice, reviewing each stack of PRs.
+- [plan](skills/engineering/plan/SKILL.md): agree what gets built, in which slices, and how each is tested.
+- [implement](skills/engineering/implement/SKILL.md): build a planned slice or a ticket into a reviewed, verified draft PR.
 - [verify](skills/engineering/verify/SKILL.md): prove a change works on its deployment, then guard it with tests.
-- [code-review](skills/engineering/code-review/SKILL.md): review a change against the repo's standards and its spec.
+- [tdd](skills/engineering/tdd/SKILL.md): write tests red-first through the given seams and cases; the standard tests are reviewed against.
+- [pr](skills/engineering/pr/SKILL.md): write a short PR body, merged with the repo's template, that shows where a wrong call would hurt.
+- [code-review](skills/engineering/code-review/SKILL.md): review a change against the repo's standards, its spec and its planned tests.
 - [research](skills/engineering/research/SKILL.md): investigate a question against primary sources.
 - [show-me](skills/engineering/show-me/SKILL.md): explain code flow or a change with visuals.
 - [retro](skills/engineering/retro/SKILL.md): turn review comments and corrections into fixes upstream.
@@ -122,8 +125,9 @@ they follow whatever the workspace documents in its `AGENTS.md`/`CLAUDE.md`.
 
 Many of these skills started from other people's work:
 
-- [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `research` and `retro` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
+- [Matt Pocock](https://github.com/mattpocock/skills): `code-review`, `brainstorm`, `implement`, `pr`, `research`, `retro` and `tdd` grew out of his skills, and this repo's layout, install story and release flow follow his. Thank you, Matt.
 - [Dex Horthy](https://github.com/dexhorthy) and [HumanLayer](https://github.com/humanlayer): `show-me` is built on their simple, lovely skill, and `plan` and `build` follow [Why Software Factories Fail](https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md).
+- [Kent Beck](https://testdesiderata.com) and [Simon Willison](https://simonwillison.net/guides/agentic-engineering-patterns/red-green-tdd/): `tdd` follows Test Desiderata and red/green TDD for agents.
 
 - [Anthropic's skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices), Matt's writing-for-agents and [Jesse Vincent's superpowers](https://github.com/obra/superpowers): `skillify`'s writing rules are drawn from all three.
 

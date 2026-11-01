@@ -1,3 +1,0 @@
-interface:
-  display_name: "Build Slice"
-  short_description: "Implement, review and verify one planned slice into a draft PR"

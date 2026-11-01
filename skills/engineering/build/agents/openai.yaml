@@ -1,5 +1,5 @@
 interface:
   display_name: "Build"
-  short_description: "Plan work with you, then build it slice by slice with checkpoints"
+  short_description: "Plan with you, build slice by slice into stacked PRs, review per stack"
 policy:
   allow_implicit_invocation: false

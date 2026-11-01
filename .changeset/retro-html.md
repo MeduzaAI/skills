@@ -2,4 +2,4 @@
 "meduza": minor
 ---
 
-`retro`: improvements are written once as `retro.yaml` and rendered by `scripts/render.mjs` into an HTML document (`assets/retro.html`), and with `--md` into the saved report; each theme as a plain-words lesson beside a diff to the file that owns the fix; the user does, skips, reroutes or edits each one, or comments for a reworked proposal in another round, and pastes back one answer block.
+`retro` writes its report once as `retro.md`, each theme a `T<n>` heading with its lesson, evidence, owner and the change as a diff, and reviews it as an HTML page built by prepending the same small review shell `plan` uses; the user pastes back feedback lines (`T1: do`, `T2: skip`, a reroute or a comment) or `approve`. The YAML schema, renderer and template are gone.
