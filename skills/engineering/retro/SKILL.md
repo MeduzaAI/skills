@@ -61,9 +61,9 @@ Write `retro.md` once, saved where the workspace keeps retros if it documents a 
 
 ## 4. Review and apply
 
-Build the review page beside `retro.md` with `cat <this skill's dir>/assets/review.html retro.md > retro.html` and open it; if you can't, give the user its path. The shell renders the Markdown and adds a comment box per theme; never read it. In chat, say only that the retro is open and to paste the copied feedback.
+Build the review page beside `retro.md` with `cat <this skill's dir>/assets/review.html retro.md > retro.html` and open it; if you can't, give the user its path. The shell renders the Markdown (components shown in `assets/components.md`) and lets the user comment on selected text or on any theme; never read it. In chat, say only that the retro is open and to paste the copied feedback.
 
-The feedback is one line per theme, or `approve` alone to apply every theme as proposed:
+The feedback is one line per theme, or `approve` alone to apply every theme as proposed. A comment on selected text quotes it first, `T2: "the window grows" cap it at half the screen`, and counts as a comment on that theme:
 
 - `T1: do`: apply it as proposed.
 - `T2: skip`: drop it; mark it skipped in `retro.md`.

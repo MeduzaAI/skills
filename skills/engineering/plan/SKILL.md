@@ -63,9 +63,9 @@ Write `plan.md`: what and why in a sentence or two, then what applies of:
 - **Slices**: a heading per slice opening with its id (`### S1 Tracer: …`), kept stable across rounds, a new slice taking the next free number; what it delivers; a file-tree diff with each file's responsibility, a call-tree diff for control-flow changes, and the signatures a builder might get wrong; then its tests.
 - **Stacks**, when there is more than one slice.
 
-Keep `plan.md` in a working folder for this issue, uncommitted. Build the review page beside it with `cat <this skill's dir>/assets/review.html plan.md > plan.html` and open it; if you can't, give the user its path. The shell renders the Markdown and Mermaid and adds a comment box per heading and table row; never read it. In chat, say only that the plan is open and to paste the copied feedback.
+Keep `plan.md` in a working folder for this issue, uncommitted. Build the review page beside it with `cat <this skill's dir>/assets/review.html plan.md > plan.html` and open it; if you can't, give the user its path. The shell renders the Markdown (fenced `mermaid` as a zoomable diagram, other fenced languages highlighted, `> [!NOTE]`-style callouts, all shown in `assets/components.md`) and lets the user comment on selected text or on any heading or table row; never read it. In chat, say only that the plan is open and to paste the copied feedback.
 
-The feedback is lines like `S1: split the migration out`, or `approve` alone. Change `plan.md` to meet each comment, or answer it if it asks something; one that reopens a decision without settling it goes back to step 2; either way, redraw what rests on that decision. Anything but `approve` → rebuild the page for another round.
+The feedback is lines like `S1: split the migration out`, or `approve` alone; a comment on selected text quotes it first, `D3: "last click wins" why not first click?`. Change `plan.md` to meet each comment, or answer it if it asks something; one that reopens a decision without settling it goes back to step 2; either way, redraw what rests on that decision. Anything but `approve` → rebuild the page for another round.
 
 After approval, a fresh subagent checks the plan against the spec and the standards for anything a builder would have to guess. Put any change it makes through the same review, then save.
 
