@@ -5,70 +5,69 @@ metadata:
   inspired-by: "Dex Horthy and HumanLayer, https://github.com/humanlayer/advanced-context-engineering-for-coding-agents/blob/main/wsff.md"
 ---
 
-Agree with the user what gets built, in which slices, and how each slice is tested, before any code exists. A decision made here costs a question; the same decision in PR review costs a rewrite.
+Agree with the user what gets built, in which slices, and how each slice is tested, before any code exists. The user reads diagrams, trees, signatures, cases and flows, and skips prose. A slice's builder reads only its part and has nobody to ask. So the plan is sections in `meduza:show-me` shapes with nothing between them: fragments over sentences, brevity over grammar, every name exact. Size it, and its research, to the change: a one-slice bug fix is a line of what and why, the file it touches and its `Cases`.
 
-Each slice may be built by an agent that reads only its part of the plan and has nobody to ask. Write down everything it would otherwise guess, and nothing it wouldn't.
-
-Size the plan, and the research behind it, to the change. A one-slice bug fix is a paragraph, the file it touches and its `Cases`, with no tables or slice headings. A project gets diagrams, contracts and tables in `meduza:show-me` shapes. Leave out whatever doesn't apply.
-
-**Consumes** what to build, from the conversation: an issue, a spec, or the user's own description; nothing yet → ask. **Produces** the approved `plan.md`, saved where the issue or spec lives: a document on the issue or project, or beside a repo-file spec, uncommitted. A description alone → it stays in the working folder, and answers that settle scope go into it as the spec.
+**Consumes** what to build, from the conversation: an issue, a spec or the user's description; nothing yet → ask. **Produces** the approved `plan.md`, saved where the issue or spec lives: a tracker document, or beside a repo-file spec, uncommitted. A description alone → it stays in the working folder, with the answers that settle scope as its spec.
 
 ## 1. Facts
 
-Research in parallel with `meduza:research`: the code the change touches and its patterns, each third-party API per its docs, and the standards of every repo involved (`AGENTS.md`/`CLAUDE.md`, path rules, testing docs). Every external contract a slice relies on goes in the plan with its primary source, never "confirm during build".
+Research in parallel with `meduza:research`: the code the change touches, each third-party API per its docs, and every involved repo's layout, naming and testing rules. Every external contract a slice relies on goes in the plan with its primary source, never "confirm during build".
 
 ## 2. Decisions
 
-List what the spec leaves open that would change behaviour, then the technical choices the codebase doesn't already settle. A documented convention is not a question; follow it.
+The user decides, before code, every choice that shapes the flow. Ask each of these the change touches, however obvious a default looks:
 
-Ask in rounds with a question tool or plain text: up to four questions whose prerequisites are settled, recommended answer first with its reason. An answer that changes the spec is written back to the spec once the user agrees.
+- Exclusion: what stops two callers doing the same work.
+- Data model: a new table, or a field or status on one that exists.
+- Where each slow or external call sits relative to transactions.
+- Which function owns each state change, and every path that reaches it.
 
-Settle every decision here, test choices that are judgement calls included, so the review page shows choices already made.
+Simplest design first. Every component, endpoint, state, retry, timer and loop serves a case or flow in a slice; one with no case is cut. A flow with a loop, a retry or a race is first five to ten plain steps, the simplest that meets its cases; its call tree follows them.
+
+Then what else the spec leaves open that would change behaviour. A documented rule is not a question; follow it. A file role, name or route the repo's rules don't cover is one: ask; don't invent it. Ask in rounds with a question tool or plain text: up to four questions whose prerequisites are settled, a few lines each, recommended answer first with its reason. A change to a core function → its call tree is a question, agreed before the rest is written. An answer that changes the spec is written back to it.
 
 ## 3. Slices
 
 A slice is one repo, one PR, cut by behaviour, not by layer:
 
-- **Demonstrable on its own**: an endpoint, a screen, an admin action, or logic proved by its tests.
-- **Tracer bullet first**: the thinnest path end to end, so the first review shows the design working. Across repos, the contract slice comes first and the tracer follows it in each repo.
+- **Demonstrable on its own**: an endpoint, a screen, or logic proved by its tests.
+- **Tracer first**: the thinnest path end to end; across repos, the contract slice, then a tracer in each.
 - **Small enough** for one review sitting and one fresh agent; a piece with no behaviour of its own joins the slice that first uses it.
-- **Prefactor first**: behaviour-neutral groundwork the reviewer should see apart (a migration, a refactor) is its own slice ahead of the tracer. What must land together stays together.
-
-A stack is a chain of dependent slices in one repo, 1 to 5 PRs, never branching off another stack. A dependency across repos is a merge-order edge, not a stack.
+- **Prefactor first**: behaviour-neutral groundwork is its own slice ahead of the tracer.
+- **Stacked**: a stack is a chain of dependent slices in one repo, 1 to 5 PRs, never branching off another stack. Across repos, a dependency is a merge-order edge.
 
 ## 4. Tests
 
-Agree each slice's tests with the user from the spec, before any code, under these exact headings:
+Agree each slice's tests with the user, placed by the repo's testing docs, under these exact headings:
 
-- `Seams`: the public interfaces the slice is tested through, one line each on what it catches.
-- `Cases`: behaviour with concrete input and expected output.
-- `Not tested`, when it matters: what, and why (trivial, covered by types, covered by a flow).
-- `Flows`, for any user-visible or cross-service path: end-to-end steps with expected results, and the error cases. They become e2e or API tests, written red first like the cases.
-
-```markdown
-**Cases**
-- `POST /session` with an expired token → 401, no session row written.
-- Two refreshes with the same token → the second gets 409.
-```
-
-"Test token validation" is not a case. Place each test in the layer the repo's testing docs give it, and list nothing those docs say not to test.
+- `Seams`: the public interfaces the slice is tested through.
+- `Cases`: one line each, concrete input → expected output: "`POST /session`, expired token → 401, no session row". A table when inputs vary together.
+- `Not tested`, when it matters: what and why.
+- `Flows`, for any user-visible or cross-service path: numbered steps, each with its expected result, error paths included.
 
 ## 5. Write and review
 
-Write `plan.md`: what and why in a sentence or two, then what applies of:
+Write `plan.md`: one line of what and why, then what applies of:
 
-- **Decisions**: a table, each row opening with its id (`D1`) and giving the reason.
+- **Decisions**: a table, one short row each with its id (`D1`) and reason. Only choices the user made and those that bound the work; a detail lives in the section that shows it.
 - **Facts**: each contract with its source.
-- **Architecture**, when components, contracts, data or states change: a sequence diagram plus one line per component on what it owns; each endpoint's method, path, request and response; changed tables and query shapes; a state diagram with every transition.
-- **Slices**: a heading per slice opening with its id (`### S1 Tracer: …`), kept stable across rounds, a new slice taking the next free number; what it delivers; a file-tree diff with each file's responsibility, a call-tree diff for control-flow changes, and the signatures a builder might get wrong; then its tests.
+- **Architecture**, when components, contracts, data or states change: an architecture or sequence diagram; a state diagram with every transition; each endpoint's method, path, request and response; changed tables and query shapes.
+- **Slices**: a heading per slice with its id (`### S1 Tracer: …`), a line on what it delivers, then `Files` (a file-tree diff, a few words per file on its role), `Call tree`, `Signatures` (each function and type added or changed, as code) and its tests. Ids read S1, S2, S3 in build order: renumber when a slice is merged into another, split or removed, between review rounds, never within one.
 - **Stacks**, when there is more than one slice.
 
-Keep `plan.md` in a working folder for this issue, uncommitted. Build the review page beside it with `cat <this skill's dir>/assets/review.html plan.md > plan.html` and open it; if you can't, give the user its path. The shell renders the Markdown (fenced `mermaid` as a zoomable diagram, other fenced languages highlighted, `> [!NOTE]`-style callouts, all shown in `assets/components.md`) and lets the user comment on selected text or on any heading or table row; never read it. In chat, say only that the plan is open and to paste the copied feedback.
+`Call tree` is its own block, never comments beside the file tree: main functions only, a diff where the code exists, transaction boundaries marked.
 
-The feedback is lines like `S1: split the migration out`, or `approve` alone; a comment on selected text quotes it first, `D3: "last click wins" why not first click?`. Change `plan.md` to meet each comment, or answer it if it asks something; one that reopens a decision without settling it goes back to step 2; either way, redraw what rests on that decision. Anything but `approve` → rebuild the page for another round.
+```text
+start
+  tx
+    insertRun
+  launchContainer    # outside tx
+```
 
-After approval, a fresh subagent checks the plan against the spec and the standards for anything a builder would have to guess. Put any change it makes through the same review, then save.
+Keep one `plan.md` in a working folder, uncommitted, edited in place: no backup copies. Build the review page with `cat <this skill's dir>/assets/review.html plan.md > plan.html` and open it; never read it. In chat, say only that it is open and to paste the copied feedback.
+
+The feedback is lines like `S1: split the migration out`, or `approve` alone. Meet each comment in `plan.md`, or answer it; one that reopens a decision goes back to step 2. Anything but `approve` → rebuild the page for another round. After approval, a fresh subagent checks the plan for anything a builder would have to guess, and every path, file role, route, table and name against each repo's layout and naming rules, listing each with the rule it meets. Its changes get the same review, then save.
 
 ## Revise
 
-When the user accepts code that differs from its slice, or asks for a change, update `plan.md` (gone → start from the saved plan): that slice to what was built, every later slice that relies on it, and the deviation as a new decision. Review and save it the same way. A slice is never built against a plan the code already contradicts.
+When the user accepts code that differs from its slice, or asks for a change, update `plan.md` (gone → start from the saved plan): that slice to what was built and every later slice that relies on it; the deviation is a decision only if it bounds later work. A merged slice shrinks to its heading and PR link. Review and save the same way.
