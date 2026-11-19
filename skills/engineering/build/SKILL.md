@@ -45,6 +45,7 @@ The user replies in plain words:
 After any push to a PR once the stack has reported (rework, `/autofix-pr`), a fresh subagent compares its shape with its slice; changed → `meduza:plan` Revise before any worker touches a slice that relies on it.
 
 Within a stack, work bottom to top: after any push to a lower PR, restack the PRs above it before a worker touches them, `gh stack rebase` then submit; without `gh stack`, rebase each branch onto the one below and force-push it. A conflict is rework for that PR's worker.
+After a squash merge, rebase the branch above `--onto` the default branch, and brief its worker with the base as it is now.
 
 ## 4. Retro
 
