@@ -1,5 +1,15 @@
 # meduza
 
+## 3.2.0
+
+### Minor Changes
+
+- [#15](https://github.com/MeduzaAI/skills/pull/15) [`2f34b37`](https://github.com/MeduzaAI/skills/commit/2f34b379dfa5e71514abdcf235806f665bfa5015) Thanks [@mattaliev](https://github.com/mattaliev)! - `plan` is rewritten from a retro, at the same length. The user now decides before code every choice that shapes the flow: exclusion, the data model, where slow or external calls sit relative to transactions, and which function owns a state change. The design is the simplest that meets its cases. The plan document is sections with nothing between them, brevity over grammar: few, short decisions, a call tree as its own block per slice with transaction boundaries marked, signatures, and one-line cases and flows. Slices are renumbered in order when one is merged, split or removed. File roles and names the repo's rules don't cover are asked, not invented, and the post-approval check verifies every name against those rules. On revise, a merged slice shrinks to its heading and PR link, and there are no backup copies.
+
+### Patch Changes
+
+- [#15](https://github.com/MeduzaAI/skills/pull/15) [`2f34b37`](https://github.com/MeduzaAI/skills/commit/2f34b379dfa5e71514abdcf235806f665bfa5015) Thanks [@mattaliev](https://github.com/mattaliev)! - `build`: after a squash merge, the branch above is rebased `--onto` the default branch, and its worker is briefed with the base as it is now.
+
 ## 3.1.0
 
 ### Minor Changes
