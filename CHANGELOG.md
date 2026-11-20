@@ -1,5 +1,19 @@
 # meduza
 
+## 3.3.0
+
+### Minor Changes
+
+- [#17](https://github.com/MeduzaAI/skills/pull/17) [`2c82621`](https://github.com/MeduzaAI/skills/commit/2c82621065739993327b2f6a2887f5493d6d22ad) Thanks [@mattaliev](https://github.com/mattaliev)! - `plan`: step 2 asks two more choices before code: the reuse boundary when a second consumer is known or named, and the visible result, shown as a sample and agreed before it is built.
+
+- [#17](https://github.com/MeduzaAI/skills/pull/17) [`2c82621`](https://github.com/MeduzaAI/skills/commit/2c82621065739993327b2f6a2887f5493d6d22ad) Thanks [@mattaliev](https://github.com/mattaliev)! - `verify`: a flow walked with the integration the change touches mocked is Not walkable, never Proved. When the repo's docs require the real path before merge, verify follows them and reports the flow so, instead of moving it to a human QA plan.
+
+### Patch Changes
+
+- [#17](https://github.com/MeduzaAI/skills/pull/17) [`2c82621`](https://github.com/MeduzaAI/skills/commit/2c82621065739993327b2f6a2887f5493d6d22ad) Thanks [@mattaliev](https://github.com/mattaliev)! - `build`: sets the model on every agent it launches, and its report lists each new secret or one-time setup step with the exact command and values filled in.
+
+- [#17](https://github.com/MeduzaAI/skills/pull/17) [`2c82621`](https://github.com/MeduzaAI/skills/commit/2c82621065739993327b2f6a2887f5493d6d22ad) Thanks [@mattaliev](https://github.com/mattaliev)! - `code-review`: the Standards axis loads every skill the repo ships for reviewing a diff, and the Duplicated Code smell names DRY and looks beyond the diff for code that copies or rebuilds what the codebase already has.
+
 ## 3.2.0
 
 ### Minor Changes
