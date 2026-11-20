@@ -21,6 +21,8 @@ The user decides, before code, every choice that shapes the flow. Ask each of th
 - Data model: a new table, or a field or status on one that exists.
 - Where each slow or external call sits relative to transactions.
 - Which function owns each state change, and every path that reaches it.
+- Reuse boundary: when a second consumer is known or named, what is shared and what stays specific to each.
+- Visible result: what the user will read or see, shown as a sample and agreed before it is built.
 
 Simplest design first. Every component, endpoint, state, retry, timer and loop serves a case or flow in a slice; one with no case is cut. A flow with a loop, a retry or a race is first five to ten plain steps, the simplest that meets its cases; its call tree follows them.
 

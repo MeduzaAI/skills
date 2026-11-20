@@ -22,6 +22,8 @@ File the slices per the workspace's documented process: one task per slice, its 
 
 Per slice, one fresh worker running `meduza:implement`, briefed the way the user would brief it with no plan at hand: the slice's full text (what it delivers, its shape, `Seams`, `Cases`, `Not tested`, `Flows`), the decisions and facts it rests on, the repo, the base (the default branch at the bottom of a stack, the slice below otherwise), and the PR of each dependency in another repo. Add links to the plan and the task as references, never as a substitute for the content.
 
+Set the model on every agent this session launches; none inherits this session's model by default. Workers and their nested agents: the strong coding model. Research, restacks and read-only checks: the cheaper one. Name both in the first status line.
+
 Within a stack, a slice starts when the one below it is built. Across stacks, it starts only once everything it depends on has passed the user's review. Independent stacks run in parallel.
 
 ## 3. Review
@@ -53,4 +55,4 @@ After the last stack passes, `meduza:retro` here, with the user, on this session
 
 ## Report
 
-One table: slice, stack, repo, PR, status, review rounds. Then what is blocked and why, where the retro landed, and the next step: which stack to merge first.
+One table: slice, stack, repo, PR, status, review rounds. Then what is blocked and why, where the retro landed, and the next step: which stack to merge first. When the work adds a secret or a one-time setup step, list each with the exact command from the repo's deployment docs and every value filled in, before the user asks.

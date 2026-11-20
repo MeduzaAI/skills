@@ -25,7 +25,7 @@ Done when both refs resolve, you have the diff against the merge-base and the co
 
 Asked to review one slice → that slice only; other slices' requirements and cases are not missing from this diff.
 
-**Standards.** The repo's `AGENTS.md`/`CLAUDE.md`, path rules whose paths match a file in the diff, review checklists kept as docs, the workspace's shared style guide for this stack, and cross-repo invariants in the workspace root `AGENTS.md`/`CLAUDE.md`. For test quality: `meduza:tdd` (its `SKILL.md`, `references/tests.md` and `references/mocking.md`, in the `tdd` folder beside this skill) and the repo's testing docs.
+**Standards.** The repo's `AGENTS.md`/`CLAUDE.md`, path rules whose paths match a file in the diff, review checklists kept as docs, every skill the repo ships whose description says to read it before reviewing a diff, the workspace's shared style guide for this stack, and cross-repo invariants in the workspace root `AGENTS.md`/`CLAUDE.md`. For test quality: `meduza:tdd` (its `SKILL.md`, `references/tests.md` and `references/mocking.md`, in the `tdd` folder beside this skill) and the repo's testing docs.
 
 **Repo review.** The repo's own review skill, whatever it is called, among the skills it ships (`.agents/skills/` or `.claude/skills/`) and plugins the workspace documents for it. None → skip the axis and say so.
 

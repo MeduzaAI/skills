@@ -16,16 +16,16 @@ Write no code in the branch: no fixes, no tests. A local mock or stub you need t
 Read how the repo runs the app and where its deployments live (`AGENTS.md`/`CLAUDE.md`, the workspace's documented process). Use the first that works:
 
 1. A deployment of the PR (the docs, or the PR's checks and comments, name it), once it runs the PR's head commit. Evidence from a stale deploy proves nothing.
-2. A local run the way the repo documents it, or the closest you can get from its docs. A dependency with its own PR → walk against that PR's deployment when it has one. Mock what cannot run and label every piece of evidence that relied on it ("mocked payments"); the real integration with the mocked piece goes into the human QA plan.
+2. A local run the way the repo documents it, or the closest you can get from its docs. A dependency with its own PR → walk against that PR's deployment when it has one. Mock what cannot run and label every piece of evidence that relied on it ("mocked payments"). A flow walked with the integration the change touches mocked is Not walkable, never Proved. The repo's docs require the real path before merge → follow them: report the flow Not walkable with the test that would reach the real path, never as a human QA step. Otherwise the real integration with the mocked piece goes into the human QA plan.
 3. Nothing can run → a static bug review of the diff: the harness's built-in correctness review when it has one, else read the diff hunting for bugs yourself. Report each finding as a suspect labelled "not run", never as a bug; the result is Unproved and every flow goes into the human QA plan.
 
 ## 2. Walk every flow
 
 Set up the data, perform the steps, and check each step's expected result as you go, not only the end state. A flow's error cases are steps too. The repo or workspace ships its own demo-recording skill → record UI with it; it knows the app's auth, data and gated flows.
 
-- **Proved**: walked end to end, every step matched, evidence linked.
+- **Proved**: walked end to end on the real integrations the change touches, every step matched, evidence linked.
 - **Broken**: the change was reached and a step did not match; expected vs actual, with evidence.
-- **Not walkable**: never got there (the app would not start, an auth wall, a destructive step nobody could approve); name the cause and whether a code change could clear it, and put the flow in the human QA plan as exact steps with expected results.
+- **Not walkable**: never got there (the app would not start, an auth wall, a destructive step nobody could approve, the changed integration mocked); name the cause and whether a code change could clear it, and put the flow in the human QA plan as exact steps with expected results, unless the repo requires its real path before merge (step 1).
 
 ## 3. Hunt bugs
 
