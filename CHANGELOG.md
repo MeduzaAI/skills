@@ -1,5 +1,11 @@
 # meduza
 
+## 3.3.1
+
+### Patch Changes
+
+- [#19](https://github.com/MeduzaAI/skills/pull/19) [`c35e783`](https://github.com/MeduzaAI/skills/commit/c35e783bd4c85b6b733414efdd1dbf41012a64d2) Thanks [@mattaliev](https://github.com/mattaliev)! - `plan` asks the user about every restriction it adds unasked, and its check after approval gives one shape to a kind of thing that two slices each add one of.
+
 ## 3.3.0
 
 ### Minor Changes
