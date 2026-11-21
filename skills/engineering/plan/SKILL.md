@@ -22,6 +22,7 @@ The user decides, before code, every choice that shapes the flow. Ask each of th
 - Where each slow or external call sits relative to transactions.
 - Which function owns each state change, and every path that reaches it.
 - Reuse boundary: when a second consumer is known or named, what is shared and what stays specific to each.
+- Restriction: every allow list, limit, filter or permission the plan adds that the user did not ask for.
 - Visible result: what the user will read or see, shown as a sample and agreed before it is built.
 
 Simplest design first. Every component, endpoint, state, retry, timer and loop serves a case or flow in a slice; one with no case is cut. A flow with a loop, a retry or a race is first five to ten plain steps, the simplest that meets its cases; its call tree follows them.
@@ -68,7 +69,7 @@ start
 
 Keep one `plan.md` in a working folder, uncommitted, edited in place: no backup copies. Build the review page with `cat <this skill's dir>/assets/review.html plan.md > plan.html` and open it; never read it. In chat, say only that it is open and to paste the copied feedback.
 
-The feedback is lines like `S1: split the migration out`, or `approve` alone. Meet each comment in `plan.md`, or answer it; one that reopens a decision goes back to step 2. Anything but `approve` → rebuild the page for another round. After approval, a fresh subagent checks the plan for anything a builder would have to guess, and every path, file role, route, table and name against each repo's layout and naming rules, listing each with the rule it meets. Its changes get the same review, then save.
+The feedback is lines like `S1: split the migration out`, or `approve` alone. Meet each comment in `plan.md`, or answer it; one that reopens a decision goes back to step 2. Anything but `approve` → rebuild the page for another round. After approval, a fresh subagent checks the plan for anything a builder would have to guess, every path, file role, route, table and name against each repo's layout and naming rules, listing each with the rule it meets, and every kind of thing two slices each add one of (a tool, a provider, a handler): the first slice defines its shape and file, the second adds one more. Its changes get the same review, then save.
 
 ## Revise
 
